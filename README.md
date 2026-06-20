@@ -1,6 +1,6 @@
 <div align="center">
 
-#№ trueCORD
+## trueCORD
 
 <img src="icon_tC_192.png" width="128" height="128" alt="trueCORD">
 **Self-hosted чат в стиле Discord, который реально можно поднять самому.**
