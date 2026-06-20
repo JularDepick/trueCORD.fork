@@ -1,6 +1,7 @@
 <div align="center">
 
 # trueCORD
+<div align="center">
 
 **Eine selbst gehostete Chat-Plattform im Discord-Stil, die du wirklich selbst betreiben kannst.**
 
