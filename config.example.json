@@ -1,0 +1,113 @@
+{
+  "project": {
+    "name": "trueCORD",
+    "tagline": "A self-hosted, Discord-style chat platform you can run yourself.",
+    "description": "trueCORD is a self-hosted chat platform with servers, text channels, direct messages, voice rooms, calls and file sharing in one familiar interface.",
+    "language": "en",
+    "url": "",
+    "api_endpoint": "truecord_api.php",
+    "default_theme": "truecolor",
+    "show_install_button": true,
+    "default_server": {
+      "name": "trueCORD",
+      "description": "Main community server",
+      "icon": "icon_tC_main.png"
+    },
+    "default_channel": {
+      "name": "general",
+      "topic": "Welcome to trueCORD",
+      "icon": ""
+    }
+  },
+  "owner": {
+    "super_admin_name": "Admin"
+  },
+  "registration": {
+    "open": true,
+    "mode": "discord",
+    "auto_validate": true,
+    "require_terms_acceptance": true,
+    "min_age": 18,
+    "username_min_length": 4,
+    "username_max_length": 24,
+    "password_min_length": 8,
+    "password_max_length": 128,
+    "first_admin_bypass_username_min_length": true,
+    "first_registered_user_becomes_super_admin": true
+  },
+  "permissions": {
+    "create_server": "member",
+    "create_channel": "member",
+    "create_voice_room": "member"
+  },
+  "discovery": {
+    "server_directory_mode": "invite_only",
+    "channel_list_mode": "all"
+  },
+  "membership": {
+    "new_user_joins_main": true,
+    "main_server_always_visible": false,
+    "auto_reconcile_on_migrate": true
+  },
+  "messaging": {
+    "enabled": true,
+    "dm_enabled": true,
+    "dm_require_validation": false,
+    "message_max_length": 4000,
+    "dm_max_length": 4000,
+    "messages_per_page": 30
+  },
+  "uploads": {
+    "max_size_default": 8388608,
+    "max_size_validated": 33554432,
+    "max_size_admin": 134217728,
+    "image_compress": true,
+    "image_max_dim": 2000,
+    "image_size_gate": 1048576,
+    "image_quality": 82
+  },
+  "voice": {
+    "enabled": true,
+    "screen_share_enabled": true,
+    "max_participants": 0,
+    "signal_ttl": 180,
+    "call_signal_ttl": 600,
+    "timeout": 30
+  },
+  "presence": {
+    "online_timeout": 90
+  },
+  "pwa": {
+    "short_name": "trueCORD",
+    "description": "A self-hosted, Discord-style chat platform you can run yourself.",
+    "theme_color": "#2d7dff",
+    "background_color": "#090d16"
+  },
+  "database": {
+    "path": "truecord.db",
+    "busy_timeout": 15000,
+    "cache_size": -16000,
+    "mmap_size": 134217728,
+    "optimize_chance": 500,
+    "optimize_interval": 3600
+  },
+  "security": {
+    "debug_mode": false,
+    "cors_enabled": false,
+    "cors_origin": "*"
+  },
+  "webrtc": {
+    "ice_servers": [
+      { "urls": "stun:stun.l.google.com:19302" },
+      { "urls": "stun:stun1.l.google.com:19302" },
+      { "urls": "stun:stun2.l.google.com:19302" }
+    ]
+  },
+  "legal": {
+    "registration_terms_file": "terms_registration.html",
+    "registration_terms_title": "Terms of Service",
+    "terms_checkbox_label": "I have read and accept the Terms of Service.",
+    "registration_modal_note": "By registering, you accept the service rules and agree to comply with applicable law.",
+    "privacy_policy_url": "privacy.html"
+  }
+}

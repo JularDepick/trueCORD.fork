@@ -1,0 +1,38 @@
+# ── trueCORD runtime data (never commit) ──────────────────────────
+# SQLite database created on first run, plus its WAL/SHM sidecars
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# User uploads and generated thumbnails. Keep the folder and its .htaccess,
+# ignore everything else inside it.
+uploads/*
+!uploads/.htaccess
+
+# Per-instance configuration. Copy config.example.json -> config.json and edit.
+# config.json IS tracked by default as a sane starting point; if you keep a
+# private production config, rename the next line's target and untrack it.
+config.local.json
+turn_config.json
+
+# ── Logs / backups ────────────────────────────────────────────────
+*.log
+*.bak
+*.tmp
+*~
+
+# ── OS / editor cruft ─────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ── Archives ──────────────────────────────────────────────────────
+*.zip
+*.tar
+*.tar.gz
+*.tgz

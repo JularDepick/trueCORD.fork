@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>trueCORD — Mini Apps API</title>
+<link rel="icon" href="icon_tC_main.png" type="image/png">
+<style>
+:root{
+  --bg0:#1e1f22;
+  --bg1:#2b2d31;
+  --bg2:#313338;
+  --bg3:#383a40;
+  --bg4:#404249;
+  --bg5:#4e5058;
+  --text:#f2f3f5;
+  --text2:#dbdee1;
+  --text3:#b5bac1;
+  --muted:#949ba4;
+  --brand:#5865f2;
+  --brand2:#4752c4;
+  --green:#23a559;
+  --red:#f23f42;
+  --warn:#f0b232;
+  --border:rgba(255,255,255,.08);
+  --border2:rgba(255,255,255,.12);
+  --radius:12px;
+  --radius-sm:8px;
+  --font:'Inter',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono','Consolas','SFMono-Regular',monospace;
+  --shadow:0 18px 60px rgba(0,0,0,.32);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;background:var(--bg0)}
+body{font-family:var(--font);background:radial-gradient(circle at top left,rgba(88,101,242,.20),transparent 32%),linear-gradient(135deg,var(--bg0),#111214);color:var(--text);font-size:15px;line-height:1.62;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:999px}::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+*{scrollbar-width:thin;scrollbar-color:var(--bg5) transparent}
+.layout{display:flex;min-height:100vh;width:min(1320px,100%);margin:0 auto;background:rgba(30,31,34,.42);box-shadow:var(--shadow)}
+.sidebar{width:274px;min-width:274px;background:rgba(43,45,49,.94);border-right:1px solid var(--border);padding:0 0 28px;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0}
+.main{flex:1;max-width:980px;padding:46px 52px 80px;min-width:0;background:rgba(49,51,56,.70)}
+.sb-logo{padding:22px 20px 18px;border-bottom:1px solid var(--border);margin-bottom:12px;background:rgba(30,31,34,.34)}
+.sb-logo-title{font-size:17px;color:var(--text);font-weight:800;display:flex;align-items:center;gap:10px;letter-spacing:.01em}
+.sb-logo-title img{width:32px;height:32px;border-radius:50%;flex-shrink:0}
+.sb-logo-sub{font-size:12px;color:var(--muted);margin-top:7px;margin-left:42px}
+.sb-section{padding:12px 18px 5px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.sb-link{display:flex;align-items:center;gap:6px;padding:7px 14px 7px 22px;margin:1px 8px;font-size:14px;color:var(--text3);text-decoration:none;border-radius:7px;transition:.12s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-link:hover{color:var(--text2);background:var(--bg3);text-decoration:none}
+.sb-link.active{color:#fff;background:var(--bg4)}
+.sb-badge{display:inline-block;background:rgba(88,101,242,.20);color:#dbe2ff;font-size:9px;border-radius:999px;padding:1px 6px;margin-left:auto;font-weight:800;text-transform:uppercase;vertical-align:middle}
+h1{font-size:38px;color:#fff;font-weight:800;margin-bottom:10px;line-height:1.1;letter-spacing:-.02em}
+h2{font-size:24px;color:#fff;margin:50px 0 16px;padding-top:42px;border-top:1px solid var(--border);letter-spacing:-.01em}
+h2:first-of-type{border-top:none;padding-top:0;margin-top:24px}
+h3{font-size:17px;font-weight:800;color:var(--text2);margin:28px 0 10px}
+p{color:var(--text3);margin-bottom:14px}
+a{color:#a5b4fc;text-decoration:none}
+a:hover{text-decoration:underline}.lead{font-size:17px;color:var(--text2);margin-bottom:24px;line-height:1.7;max-width:840px}
+code{font-family:var(--mono);font-size:13px;background:rgba(0,0,0,.22);border:1px solid var(--border);padding:2px 6px;border-radius:6px;color:#dbe2ff}
+pre{background:#1e1f22;border:1px solid var(--border2);border-radius:var(--radius);padding:20px 22px;overflow-x:auto;margin:16px 0 24px;position:relative;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+pre code{background:none;border:none;padding:0;font-size:13px;color:var(--text2);line-height:1.72;white-space:pre}
+.copy-btn{position:absolute;top:10px;right:10px;background:var(--bg4);border:1px solid var(--border2);color:var(--text3);border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:var(--font);transition:.12s;font-weight:700}.copy-btn:hover{background:var(--brand);color:#fff}.copy-btn.copied{color:#fff;background:var(--green);border-color:transparent}
+.tok-string{color:#a5d6a7}.tok-key{color:#90caf9}.tok-comment{color:#949ba4;font-style:italic}.tok-fn{color:#c4b5fd}.tok-kw{color:#fca5a5}.tok-num{color:#fdba74}
+.method-card{background:rgba(43,45,49,.92);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.14)}
+.method-header{display:flex;align-items:center;gap:10px;padding:14px 18px;background:rgba(30,31,34,.56);border-bottom:1px solid var(--border)}
+.method-badge{font-family:var(--mono);font-size:11px;font-weight:800;padding:3px 8px;border-radius:999px;flex-shrink:0;text-transform:uppercase}.badge-fn{background:rgba(88,101,242,.20);color:#dbe2ff}.badge-async{background:rgba(79,70,229,.20);color:#c4b5fd}.badge-event{background:rgba(35,165,89,.16);color:#86efac}.method-name{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text2);min-width:0;overflow:hidden;text-overflow:ellipsis}.method-desc{font-size:13px;color:var(--muted);margin-left:auto;white-space:nowrap}.method-body{padding:17px 18px}
+.param-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:12px}.param-table th{text-align:left;color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:4px 8px 9px;border-bottom:1px solid var(--border)}.param-table td{padding:8px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:top;color:var(--text3)}.param-table td:first-child{font-family:var(--mono);font-size:12px;color:#dbe2ff}.param-table td:nth-child(2){color:#a5b4fc;font-family:var(--mono);font-size:12px}.param-optional{color:var(--muted)!important}.returns{background:rgba(35,165,89,.10);border:1px solid rgba(35,165,89,.24);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text3);margin-top:8px}.returns strong{color:#86efac}
+.alert{border-radius:var(--radius);padding:14px 16px;margin:20px 0;font-size:14px;line-height:1.6}.alert-info{background:rgba(88,101,242,.12);border:1px solid rgba(88,101,242,.28);color:var(--text2)}.alert-warn{background:rgba(240,178,50,.11);border:1px solid rgba(240,178,50,.32);color:var(--text2)}.alert-success{background:rgba(35,165,89,.11);border:1px solid rgba(35,165,89,.28);color:var(--text2)}.alert strong{font-weight:800;color:#fff}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}.tag{display:inline-block;background:var(--bg3);border:1px solid var(--border);border-radius:999px;padding:3px 10px;font-size:12px;color:var(--text3)}
+.hero{background:linear-gradient(135deg,rgba(88,101,242,.18),rgba(124,58,237,.10));border:1px solid rgba(88,101,242,.24);border-radius:18px;padding:28px 32px;margin-bottom:40px}.hero-title{font-size:12px;color:#dbe2ff;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;font-weight:800}.hero p{color:var(--text2)}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:20px 0 6px}.feat-card{background:rgba(30,31,34,.65);border:1px solid var(--border);border-radius:14px;padding:15px 16px}.feat-icon{font-size:22px;margin-bottom:8px}.feat-name{font-size:14px;font-weight:800;color:#fff;margin-bottom:4px}.feat-desc{font-size:12px;color:var(--muted);line-height:1.5}
+ul{color:var(--text3);padding-left:22px;line-height:2}.top-link{display:inline-flex;align-items:center;gap:8px;margin:0 0 22px;color:var(--text3);font-weight:700;font-size:13px}.top-link:hover{color:#fff;text-decoration:none}
+@media(max-width:860px){.layout{flex-direction:column}.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid var(--border);max-height:380px}.main{padding:26px 20px 60px}h1{font-size:30px}h2{font-size:20px}.method-header{align-items:flex-start;flex-wrap:wrap}.method-desc{margin-left:0}.param-table{display:block;overflow-x:auto}pre code{white-space:pre-wrap}}
+</style>
+</head>
+<body class="miniapp-api-body">
+<div class="layout">
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-title"><img src="icon_tC_main.png" alt="trueCORD">trueCORD API</div>
+    <div class="sb-logo-sub">Mini Apps Developer Docs v1.0</div>
+  </div>
+  <div class="sb-section">Начало работы</div>
+  <a class="sb-link active" href="#overview">Обзор</a>
+  <a class="sb-link" href="#integration">Подключение</a>
+  <a class="sb-link" href="#sandbox">Sandbox</a>
+  <div class="sb-section">Методы API</div>
+  <a class="sb-link" href="#notify">notify <span class="sb-badge">DI</span></a>
+  <a class="sb-link" href="#toast">toast <span class="sb-badge">DI</span></a>
+  <a class="sb-link" href="#getme">getMe</a>
+  <a class="sb-link" href="#getmembers">getMembers</a>
+  <a class="sb-link" href="#getserver">getServer</a>
+  <a class="sb-link" href="#sendmessage">sendMessage</a>
+  <a class="sb-link" href="#getmessages">getMessages</a>
+  <a class="sb-link" href="#invite">inviteToGame</a>
+  <a class="sb-link" href="#accept">acceptInvite</a>
+  <a class="sb-link" href="#store">storeGet / storeSet</a>
+  <a class="sb-link" href="#subscribe">subscribe</a>
+  <a class="sb-link" href="#close">close / minimize</a>
+  <a class="sb-link" href="#openDM">openDM</a>
+  <div class="sb-section">Примеры</div>
+  <a class="sb-link" href="#example-checkers">Шашки (PvP)</a>
+  <a class="sb-link" href="#example-poll">Голосование</a>
+  <a class="sb-link" href="#example-store">Хранилище данных</a>
+  <div class="sb-section">Справочник</div>
+  <a class="sb-link" href="#postmessage">postMessage API</a>
+  <a class="sb-link" href="#types">Типы данных</a>
+  <a class="sb-link" href="#limits">Ограничения</a>
+</nav>
+
+<!-- Main content -->
+<main class="main">
+
+<div id="overview">
+<a class="top-link" href="./">← Открыть trueCORD</a>
+<h1>trueCORD Mini Apps API</h1>
+<p class="lead">Документация для мини-приложений trueCORD. Mini Apps открываются внутри канала и могут работать с сообщениями, пользователями, уведомлениями и локальным хранилищем через встроенный JavaScript API.</p>
+
+<div class="hero">
+  <div class="hero-title">Версия 1.0.0</div>
+  <p>MiniApp API предоставляет мини-приложениям доступ к функциям платформы: отправка сообщений, уведомления через Dynamic Island, управление данными, приглашения в игры и реалтайм-подписки. Для безопасности API работает только внутри iframe, загруженного платформой.</p>
+</div>
+
+<div class="feat-grid">
+  <div class="feat-card">
+    <div class="feat-icon">🔔</div>
+    <div class="feat-name">Dynamic Island</div>
+    <div class="feat-desc">Нативные уведомления через DI — тосты и полноэкранные нотифы</div>
+  </div>
+  <div class="feat-card">
+    <div class="feat-icon">💬</div>
+    <div class="feat-name">Сообщения</div>
+    <div class="feat-desc">Отправка и чтение сообщений канала от имени текущего пользователя</div>
+  </div>
+  <div class="feat-card">
+    <div class="feat-icon">👥</div>
+    <div class="feat-name">Пользователи</div>
+    <div class="feat-desc">Список участников, профиль текущего юзера, статусы онлайн</div>
+  </div>
+  <div class="feat-card">
+    <div class="feat-icon">🎮</div>
+    <div class="feat-name">Игровые приглашения</div>
+    <div class="feat-desc">Invite/Accept паттерн для мультиплеер-игр внутри платформы</div>
+  </div>
+  <div class="feat-card">
+    <div class="feat-icon">🗄</div>
+    <div class="feat-name">Хранилище</div>
+    <div class="feat-desc">Персистентное key-value хранилище, привязанное к каналу мини-апп</div>
+  </div>
+  <div class="feat-card">
+    <div class="feat-icon">📡</div>
+    <div class="feat-name">Подписки</div>
+    <div class="feat-desc">Реалтайм-подписки на новые сообщения в канале</div>
+  </div>
+</div>
+</div>
+
+<h2 id="integration">Подключение API</h2>
+
+<p>Мини-приложение работает внутри <code>&lt;iframe&gt;</code> с атрибутом <code>sandbox="allow-scripts allow-forms allow-popups allow-same-origin"</code>. Есть два способа обращаться к API:</p>
+
+<h3>Способ 1 — прямой вызов (если same-origin)</h3>
+<pre><button class="copy-btn" onclick="copyCode(this)">Копировать</button><code><span class="tok-comment">// Прямой доступ через window.parent (работает только если
+// мини-апп хранится на том же домене что и trueCORD)</span>
+<span class="tok-kw">const</span> <span class="tok-key">API</span> = window.parent.TES3API;
+
+<span class="tok-comment">// Получить текущего пользователя</span>
+<span class="tok-kw">const</span> <span class="tok-key">me</span> = API.<span class="tok-fn">getMe</span>();
+console.log(me.user.name); <span class="tok-comment">// 'Admin'</span>
+
+<span class="tok-comment">// Показать уведомление в Dynamic Island</span>
+API.<span class="tok-fn">notify</span>(<span class="tok-string">'Ход сделан!'</span>, <span class="tok-string">'Ваш противник походил в шашках'</span>);</code></pre>
+
+<h3>Способ 2 — postMessage (универсальный)</h3>
+<p>Используйте postMessage если приложение хранится на другом домене или вы хотите async/await интерфейс:</p>
+<pre><button class="copy-btn" onclick="copyCode(this)">Копировать</button><code><span class="tok-comment">// Вспомогательный класс для работы с TES3API через postMessage</span>
+<span class="tok-kw">class</span> <span class="tok-fn">TrueCordBridge</span> {
+  <span class="tok-fn">constructor</span>() {
+    <span class="tok-kw">this</span>._pending = {};
+    <span class="tok-kw">this</span>._id = <span class="tok-num">0</span>;
+    window.addEventListener(<span class="tok-string">'message'</span>, (e) => {
+      <span class="tok-kw">if</span> (!e.data?.tes3 || !e.data.callId) <span class="tok-kw">return</span>;
+      <span class="tok-kw">const</span> { callId, result } = e.data;
+      <span class="tok-kw">if</span> (<span class="tok-kw">this</span>._pending[callId]) {
+        <span class="tok-kw">this</span>._pending[callId](result);
+        <span class="tok-kw">delete this</span>._pending[callId];
+      }
+    });
+  }
+
+  <span class="tok-fn">call</span>(action, params = {}) {
+    <span class="tok-kw">return new</span> <span class="tok-fn">Promise</span>((resolve) => {
+      <span class="tok-kw">const</span> callId = ++<span class="tok-kw">this</span>._id;
+      <span class="tok-kw">this</span>._pending[callId] = resolve;
+      window.parent.postMessage({ tes3: <span class="tok-kw">true</span>, callId, action, ...params }, <span class="tok-string">'*'</span>);
+    });
+  }
+}
+
+<span class="tok-comment">// Использование</span>
+<span class="tok-kw">const</span> bridge = <span class="tok-kw">new</span> <span class="tok-fn">TrueCordBridge</span>();
+
+<span class="tok-kw">const</span> me = <span class="tok-kw">await</span> bridge.<span class="tok-fn">call</span>(<span class="tok-string">'getMe'</span>);
+console.log(me.user.name);
+
+<span class="tok-kw">await</span> bridge.<span class="tok-fn">call</span>(<span class="tok-string">'notify'</span>, {
+  title: <span class="tok-string">'Игра найдена!'</span>,
+  text: <span class="tok-string">'Соперник принял вызов'</span>,
+  opts: { icon: <span class="tok-string">'🎮'</span> }
+});</code></pre>
+
+<div class="alert alert-info">
+  <strong>Совет:</strong> Сохраните код класса <code>TrueCordBridge</code> в начале своего мини-приложения. Это обёртка с нулевыми зависимостями, которая работает в любом браузере.
+</div>
+
+<h2 id="sandbox">Sandbox — тестирование</h2>
+<p>Для тестирования API без деплоя используйте встроенный шаблон:</p>
+<pre><button class="copy-btn" onclick="copyCode(this)">Копировать</button><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;&lt;meta charset="UTF-8"&gt;&lt;/head&gt;
+&lt;body style="background:#1a1a1a;color:#e8d5b0;font-family:sans-serif;padding:20px"&gt;
+  &lt;h2&gt;trueCORD MiniApp Sandbox&lt;/h2&gt;
+  &lt;button onclick="testNotify()"&gt;Test DI Notify&lt;/button&gt;
+  &lt;button onclick="testGetMe()"&gt;Get Me&lt;/button&gt;
+  &lt;pre id="output"&gt;&lt;/pre&gt;
+  &lt;script&gt;
+    <span class="tok-comment">// Вставьте сюда класс TrueCordBridge из примера выше</span>
+    <span class="tok-kw">const</span> bridge = <span class="tok-kw">new</span> TrueCordBridge();
+    <span class="tok-kw">const</span> out = document.getElementById(<span class="tok-string">'output'</span>);
+
+    <span class="tok-kw">async function</span> <span class="tok-fn">testNotify</span>() {
+      <span class="tok-kw">const</span> r = <span class="tok-kw">await</span> bridge.<span class="tok-fn">call</span>(<span class="tok-string">'notify'</span>, {
+        title: <span class="tok-string">'Тест уведомления'</span>,
+        text: <span class="tok-string">'Dynamic Island работает!'</span>,
+        opts: { icon: <span class="tok-string">'🧪'</span> }
+      });
+      out.textContent = JSON.stringify(r, <span class="tok-kw">null</span>, <span class="tok-num">2</span>);
+    }
+
+    <span class="tok-kw">async function</span> <span class="tok-fn">testGetMe</span>() {
+      <span class="tok-kw">const</span> r = <span class="tok-kw">await</span> bridge.<span class="tok-fn">call</span>(<span class="tok-string">'getMe'</span>);
+      out.textContent = JSON.stringify(r, <span class="tok-kw">null</span>, <span class="tok-num">2</span>);
+    }
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+<!-- API METHODS -->
+<h2 id="notify">notify(title, text, opts?)</h2>
+<div class="method-card">
+  <div class="method-header">
+    <span class="method-badge badge-fn">function</span>
+    <span class="method-name">TES3API.notify(title, text, opts?)</span>
+    <span class="method-desc">Dynamic Island уведомление</span>
+  </div>
+  <div class="method-body">
+    <p>Показывает уведомление через Dynamic Island. Если пользователь кликнет — срабатывает <code>opts.onClick</code>.</p>
+    <table class="param-table">
+      <tr><th>Параметр</th><th>Тип</th><th>Описание</th></tr>
+      <tr><td>title</td><td>string</td><td>Заголовок уведомления</td></tr>
+      <tr><td>text</td><td>string</td><td>Текст уведомления</td></tr>
+      <tr><td class="param-optional">opts.icon</td><td>string?</td><td>Эмодзи иконка (по умолч. 🧩)</td></tr>
+      <tr><td class="param-optional">opts.avatarEmoji</td><td>string?</td><td>Символ аватара в DI</td></tr>
+      <tr><td class="param-optional">opts.dotColor</td><td>'red'|'green'|''</td><td>Цвет живой точки</td></tr>
+      <tr><td class="param-optional">opts.onClick</td><td>function?</td><td>Callback при клике (только прямой вызов)</td></tr>
+    </table>
+    <div class="returns"><strong>Возвращает:</strong> void</div>
+    <pre><button class="copy-btn" onclick="copyCode(this)">Копировать</button><code>API.notify(<span class="tok-string">'🎮 Ход противника'</span>, <span class="tok-string">'Петров сделал ход в шашках'</span>, {
+  icon: <span class="tok-string">'♟'</span>,
+  dotColor: <span class="tok-string">'red'</span>,
+});</code></pre>
+  </div>
+</div>
+
+<h2 id="toast">toast(message, type?, duration?)</h2>
+<div class="method-card">
+  <div class="method-header">
+    <span class="method-badge badge-fn">function</span>
+    <span class="method-name">TES3API.toast(message, type?, duration?)</span>
+    <span class="method-desc">Системное сообщение через DI</span>
+  </div>
+  <div class="method-body">
+    <p>Краткое системное сообщение в Dynamic Island (не остаётся в истории уведомлений).</p>
+    <table class="param-table">
+      <tr><th>Параметр</th><th>Тип</th><th>Описание</th></tr>
+      <tr><td>message</td><td>string</td><td>Текст сообщения</td></tr>
+      <tr><td class="param-optional">type</td><td>'ok'|'err'|'info'</td><td>Тип (влияет на иконку и цвет). По умолч.: 'info'</td></tr>
+      <tr><td class="param-optional">duration</td><td>number</td><td>Длительность в мс. По умолч.: 3000</td></tr>
+    </table>
+    <pre><button class="copy-btn" onclick="copyCode(this)">Копировать</button><code>API.toast(<span class="tok-string">'Ход сохранён ✓'</span>, <span class="tok-string">'ok'</span>, <span class="tok-num">2000</span>);</code></pre>
+  </div>
+</div>
+
+<h2 id="getme">getMe()</h2>
+<div class="method-card">
+  <div class="method-header">
+    <span class="method-badge badge-fn">function</span>
+    <span class="method-name">TES3API.getMe()</span>
+    <span class="method-desc">Текущий пользователь</span>
+  </div>
+  <div class="method-body">
+    <p>Возвращает профиль авторизованного пользователя.</p>
+    <div class="returns"><strong>Возвращает:</strong> <code>{ok, user: {id, name, avatar, validated, globalRole}}</code></div>
+    <pre><button class="copy-btn" onclick="copyCode(this)">Копировать</button><code><span class="tok-kw">const</span> { user } = API.<span class="tok-fn">getMe</span>();
+<span class="tok-comment">// user = { id: 1, name: 'Admin', avatar: '', validated: true, globalRole: 'super_admin' }</span></code></pre>
+  </div>
+</div>
+
+<h2 id="getmembers">getMembers()</h2>
+<div class="method-card">
+  <div class="method-header">
+    <span class="method-badge badge-fn">function</span>
+    <span class="method-name">TES3API.getMembers()</span>
+    <span class="method-desc">Участники сервера</span>
+  </div>
+  <div class="method-body">
+    <p>Список всех участников текущего сервера с их статусами онлайн.</p>
+    <div class="returns"><strong>Возвращает:</strong> <code>{ok, members: Member[]}</code></div>
+    <pre><button class="copy-btn" onclick="copyCode(this)">Копировать</button><code><span class="tok-kw">const</span> { members } = API.<span class="tok-fn">getMembers</span>();
+<span class="tok-kw">const</span> online = members.filter(m => m.online);
+console.log(<span class="tok-string">`Онлайн: ${online.length}`</span>);</code></pre>
+  </div>
+</div>
+
+<h2 id="sendmessage">sendMessage(channelId, text)</h2>
+<div class="method-card">
+  <div class="method-header">
+    <span class="method-badge badge-async">async</span>
+    <span class="method-name">TES3API.sendMessage(channelId, text)</span>
+    <span class="method-desc">Отправить сообщение</span>
+  </div>
+  <div class="method-body">
+    <p>Отправляет сообщение в указанный канал от имени текущего пользователя. Требует верификации.</p>
+    <table class="param-table">
+      <tr><th>Параметр</th><th>Тип</th><th>Описание</th></tr>
+      <tr><td>channelId</td><td>number</td><td>ID канала</td></tr>
+      <tr><td>text</td><td>string</td><td>Текст сообщения (макс. 4000 символов)</td></tr>
+    </table>
+    <pre><button class="copy-btn" onclick="copyCode(this)">Копировать</button><code><span class="tok-kw">const</span> r = <span class="tok-kw">await</span> API.<span class="tok-fn">sendMessage</span>(<span class="tok-num">42</span>, <span class="tok-string">'Я выиграл в шашках! 🏆'</span>);
+<span class="tok-kw">if</span> (r.ok) API.<span class="tok-fn">toast</span>(<span class="tok-string">'Сообщение отправлено'</span>, <span class="tok-string">'ok'</span>);</code></pre>
+  </div>
+</div>
+
+<h2 id="invite">inviteToGame(gameName, payload?)</h2>
+<div class="method-card">
+  <div class="method-header">
+    <span class="method-badge badge-async">async</span>
+    <span class="method-name">TES3API.inviteToGame(gameName, payload?)</span>
+    <span class="method-desc">Пригласить в игру</span>
+  </div>
+  <div class="method-body">
+    <p>Отправляет структурированное приглашение в игру через системное сообщение в текущем канале. Другие пользователи могут принять приглашение через <code>acceptInvite()</code>.</p>
+    <table class="param-table">
+      <tr><th>Параметр</th><th>Тип</th><th>Описание</th></tr>
+      <tr><td>gameName</td><td>string</td><td>Идентификатор игры (напр. 'checkers')</td></tr>
+      <tr><td class="param-optional">payload</td><td>object?</td><td>Произвольные данные (параметры партии и т.д.)</td></tr>
+    </table>
+    <div class="returns"><strong>Формат сообщения:</strong> <code>[INVITE:gameName] {"key":"value"}</code></div>
+    <pre><button class="copy-btn" onclick="copyCode(this)">Копировать</button><code><span class="tok-comment">// Игрок 1: отправляет приглашение</span>
+<span class="tok-kw">await</span> API.<span class="tok-fn">inviteToGame</span>(<span class="tok-string">'checkers'</span>, {
+  color: <span class="tok-string">'white'</span>,
+  timeLimit: <span class="tok-num">600</span>,
+});
+
+<span class="tok-comment">// Игрок 2: слушает сообщения, находит INVITE, принимает</span>
+<span class="tok-kw">const</span> msgs = <span class="tok-kw">await</span> API.<span class="tok-fn">getMessages</span>(channelId);
+<span class="tok-kw">const</span> invite = msgs.messages.find(m =>
+  m.text.startsWith(<span class="tok-string">'[INVITE:checkers]'</span>)
+);
+<span class="tok-kw">if</span> (invite) <span class="tok-kw">await</span> API.<span class="tok-fn">acceptInvite</span>(channelId, invite.id);</code></pre>
+  </div>
+</div>
+
+<h2 id="store">storeGet / storeSet / storeDelete</h2>
+<div class="method-card">
+  <div class="method-header">
+    <span class="method-badge badge-async">async</span>
+    <span class="method-name">storeGet(key) / storeSet(key, value) / storeDelete(key)</span>
+    <span class="method-desc">Хранилище данных</span>
+  </div>
+  <div class="method-body">
+    <p>Персистентное key-value хранилище, привязанное к каналу мини-приложения. Данные сохраняются между сессиями. Значения автоматически сериализуются в JSON.</p>
+    <pre><button class="copy-btn" onclick="copyCode(this)">Копировать</button><code><span class="tok-comment">// Сохранить состояние игры</span>
+<span class="tok-kw">await</span> API.<span class="tok-fn">storeSet</span>(<span class="tok-string">'gameState'</span>, {
+  board: boardArray,
+  turn: <span class="tok-string">'black'</span>,
+  moves: <span class="tok-num">14</span>,
+});
+
+<span class="tok-comment">// Восстановить при загрузке</span>
+<span class="tok-kw">const</span> saved = <span class="tok-kw">await</span> API.<span class="tok-fn">storeGet</span>(<span class="tok-string">'gameState'</span>);
+<span class="tok-kw">if</span> (saved.ok && saved.value) {
+  <span class="tok-kw">const</span> state = JSON.parse(saved.value);
+  restoreGame(state);
+}</code></pre>
+  </div>
+</div>
+
+<h2 id="subscribe">subscribe(channelId, callback)</h2>
+<div class="method-card">
+  <div class="method-header">
+    <span class="method-badge badge-event">event</span>
+    <span class="method-name">TES3API.subscribe(channelId, callback)</span>
+    <span class="method-desc">Подписка на сообщения</span>
+  </div>
+  <div class="method-body">
+    <p>Подписывается на новые сообщения в канале. Callback вызывается при каждом новом сообщении через polling платформы. Работает только при прямом вызове через <code>window.parent.TES3API</code>.</p>
+    <div class="returns"><strong>Возвращает:</strong> функцию отписки <code>() => void</code></div>
+    <pre><button class="copy-btn" onclick="copyCode(this)">Копировать</button><code><span class="tok-kw">const</span> API = window.parent.TES3API;
+
+<span class="tok-comment">// Подписка</span>
+<span class="tok-kw">const</span> unsubscribe = API.<span class="tok-fn">subscribe</span>(<span class="tok-num">42</span>, (msg) => {
+  <span class="tok-kw">if</span> (msg.text.startsWith(<span class="tok-string">'[ACCEPT:]'</span>)) {
+    startGame(msg.userId);
+  }
+});
+
+<span class="tok-comment">// Отписка при уничтожении компонента</span>
+window.addEventListener(<span class="tok-string">'beforeunload'</span>, unsubscribe);</code></pre>
+  </div>
+</div>
+
+<!-- EXAMPLES -->
+<h2 id="example-checkers">Пример: Шашки (PvP)</h2>
+<p>Полный паттерн для реализации PvP-игры между двумя пользователями на платформе:</p>
+<pre><button class="copy-btn" onclick="copyCode(this)">Копировать</button><code><span class="tok-comment">/**
+ * ШАШКИ — trueCORD MiniApp
+ * Полный пример PvP игры с invite/accept паттерном
+ */</span>
+
+<span class="tok-comment">// 1. Инициализация</span>
+<span class="tok-kw">const</span> bridge = <span class="tok-kw">new</span> TrueCordBridge();
+<span class="tok-kw">let</span> gameState = { active: <span class="tok-kw">false</span>, opponentId: <span class="tok-kw">null</span> };
+<span class="tok-kw">const</span> me = <span class="tok-kw">await</span> bridge.<span class="tok-fn">call</span>(<span class="tok-string">'getMe'</span>);
+<span class="tok-kw">const</span> channelId = <span class="tok-num">42</span>; <span class="tok-comment">// ID канала мини-апп</span>
+
+<span class="tok-comment">// 2. Отправить приглашение конкретному игроку</span>
+<span class="tok-kw">async function</span> <span class="tok-fn">sendInvite</span>(opponentName) {
+  <span class="tok-kw">await</span> bridge.<span class="tok-fn">call</span>(<span class="tok-string">'notify'</span>, {
+    title: <span class="tok-string">'🎮 Приглашение'</span>,
+    text: <span class="tok-string">`@${opponentName} вы приглашены в шашки!`</span>,
+    opts: { icon: <span class="tok-string">'♟'</span> }
+  });
+  <span class="tok-kw">await</span> bridge.<span class="tok-fn">call</span>(<span class="tok-string">'inviteToGame'</span>, {
+    gameName: <span class="tok-string">'checkers'</span>,
+    payload: {
+      inviterId: me.user.id,
+      inviterName: me.user.name,
+      target: opponentName,
+    }
+  });
+}
+
+<span class="tok-comment">// 3. Polling — ищем ACCEPT ответ</span>
+<span class="tok-kw">let</span> lastMsgId = <span class="tok-num">0</span>;
+<span class="tok-kw">async function</span> <span class="tok-fn">pollMessages</span>() {
+  <span class="tok-kw">const</span> r = <span class="tok-kw">await</span> bridge.<span class="tok-fn">call</span>(<span class="tok-string">'getMessages'</span>, { channelId, limit: <span class="tok-num">10</span> });
+  <span class="tok-kw">if</span> (!r.ok) <span class="tok-kw">return</span>;
+
+  r.messages.forEach(msg => {
+    <span class="tok-kw">if</span> (msg.id <= lastMsgId) <span class="tok-kw">return</span>;
+    lastMsgId = Math.max(lastMsgId, msg.id);
+
+    <span class="tok-comment">// Кто-то принял наше приглашение</span>
+    <span class="tok-kw">if</span> (msg.text.startsWith(<span class="tok-string">'[ACCEPT:'</span>)) {
+      gameState = { active: <span class="tok-kw">true</span>, opponentId: msg.userId };
+      <span class="tok-fn">startGame</span>(msg.userId);
+    }
+
+    <span class="tok-comment">// Ход противника</span>
+    <span class="tok-kw">if</span> (gameState.active && msg.userId === gameState.opponentId
+        && msg.text.startsWith(<span class="tok-string">'[MOVE:'</span>)) {
+      <span class="tok-kw">const</span> move = JSON.parse(msg.text.slice(<span class="tok-num">7</span>, -<span class="tok-num">1</span>));
+      <span class="tok-fn">applyMove</span>(move);
+      bridge.<span class="tok-fn">call</span>(<span class="tok-string">'notify'</span>, {
+        title: <span class="tok-string">'♟ Противник ходит'</span>,
+        text: <span class="tok-string">`${msg.name} сделал ход`</span>
+      });
+    }
+  });
+}
+setInterval(pollMessages, <span class="tok-num">2000</span>);
+
+<span class="tok-comment">// 4. Отправить ход</span>
+<span class="tok-kw">async function</span> <span class="tok-fn">sendMove</span>(from, to) {
+  <span class="tok-kw">await</span> bridge.<span class="tok-fn">call</span>(<span class="tok-string">'sendMessage'</span>, {
+    channelId,
+    text: <span class="tok-string">`[MOVE:${JSON.stringify({from,to})}]`</span>
+  });
+  <span class="tok-comment">// Сохранить состояние доски</span>
+  <span class="tok-kw">await</span> bridge.<span class="tok-fn">call</span>(<span class="tok-string">'storeSet'</span>, {
+    key: <span class="tok-string">'board'</span>,
+    value: getCurrentBoard()
+  });
+}</code></pre>
+
+<h2 id="postmessage">postMessage API — полный справочник</h2>
+<p>Все действия доступные через <code>window.parent.postMessage</code>:</p>
+<table class="param-table" style="width:100%">
+  <tr><th>action</th><th>Параметры</th><th>Описание</th></tr>
+  <tr><td>notify</td><td>title, text, opts?</td><td>DI уведомление</td></tr>
+  <tr><td>toast</td><td>message, type?, duration?</td><td>DI тост</td></tr>
+  <tr><td>getMe</td><td>—</td><td>Текущий пользователь</td></tr>
+  <tr><td>getMembers</td><td>—</td><td>Участники сервера</td></tr>
+  <tr><td>getServer</td><td>—</td><td>Информация о сервере</td></tr>
+  <tr><td>sendMessage</td><td>channelId, text</td><td>Отправить сообщение</td></tr>
+  <tr><td>getMessages</td><td>channelId, limit?</td><td>Получить сообщения</td></tr>
+  <tr><td>inviteToGame</td><td>gameName, payload?</td><td>Пригласить в игру</td></tr>
+  <tr><td>acceptInvite</td><td>channelId, inviteMessageId</td><td>Принять приглашение</td></tr>
+  <tr><td>storeGet</td><td>key</td><td>Получить значение</td></tr>
+  <tr><td>storeSet</td><td>key, value</td><td>Сохранить значение</td></tr>
+  <tr><td>storeDelete</td><td>key</td><td>Удалить значение</td></tr>
+  <tr><td>close</td><td>—</td><td>Закрыть мини-апп</td></tr>
+  <tr><td>minimize</td><td>—</td><td>Свернуть мини-апп</td></tr>
+  <tr><td>openDM</td><td>userId, userName, avatar?</td><td>Открыть ЛС</td></tr>
+</table>
+
+<h2 id="limits">Ограничения</h2>
+<div class="alert alert-warn">
+  <strong>Важно:</strong> Мини-приложения запускаются в iframe с ограниченным sandbox. Не все браузерные API доступны.
+</div>
+<ul style="color:var(--text2);padding-left:20px;line-height:2">
+  <li>Размер данных в хранилище: не более <strong>64 КБ</strong> на ключ, <strong>1 МБ</strong> суммарно на канал</li>
+  <li>Сообщения через <code>sendMessage</code>: не чаще <strong>1 раза в секунду</strong></li>
+  <li>Доступ к камере, микрофону, геолокации — <strong>запрещён</strong></li>
+  <li>Отправка сообщений требует <strong>верифицированного аккаунта</strong></li>
+  <li>Мини-апп работает только пока его окно открыто</li>
+  <li><code>subscribe()</code> требует прямого вызова через <code>window.parent.TES3API</code></li>
+</ul>
+
+</main>
+</div>
+
+<script>
+function copyCode(btn) {
+  const pre = btn.parentElement;
+  const code = pre.querySelector('code').textContent;
+  navigator.clipboard.writeText(code).then(()=>{
+    btn.textContent = 'Скопировано ✓';
+    btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='Копировать'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+// Sidebar active link on scroll
+const headings = document.querySelectorAll('h2[id]');
+const links = document.querySelectorAll('.sb-link[href^="#"]');
+window.addEventListener('scroll', ()=>{
+  let active = '';
+  headings.forEach(h=>{ if(window.scrollY >= h.offsetTop - 80) active = h.id; });
+  links.forEach(l=>l.classList.toggle('active', l.getAttribute('href')==='#'+active));
+});
+</script>
+</body>
+</html>

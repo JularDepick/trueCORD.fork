@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>3D Шашки — TES3Chat</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:#0e0c09;color:#e8d5b0;overflow:hidden;height:100vh;height:100dvh;display:flex;flex-direction:column;position:fixed;width:100%;}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh;position:relative;}
+/* ── CSS Variables ─────────────────────────────────────── */
+:root{
+  --glass-bg:rgba(14,12,9,0.55);
+  --glass-bg2:rgba(18,15,10,0.7);
+  --glass-border:rgba(255,255,255,0.08);
+  --glass-border-gold:rgba(201,170,113,0.18);
+  --glass-blur:blur(40px) saturate(180%);
+  --glass-blur-sm:blur(20px) saturate(150%);
+  --glass-shadow:0 12px 48px rgba(0,0,0,0.75),0 0 0 1px rgba(255,255,255,0.04),inset 0 1px 0 rgba(255,255,255,0.06);
+  --glass-shadow-sm:0 4px 24px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04);
+  --glass-highlight:inset 0 1px 0 rgba(255,255,255,0.08),inset 0 -1px 0 rgba(0,0,0,0.2);
+  --gold:#c9aa71;--gold2:#a8884e;--gold3:#7a6032;
+  --text:#e8d5b0;--text2:#b09a6e;--text3:#7a6640;
+  --bg0:#0e0c09;--bg3:#272318;--bg4:#312c1f;--bg5:#3c3526;
+  --green:#4e9160;--red:#962929;--blue:#4a7fa3;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+#header{
+  background:var(--glass-bg);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  border-bottom:1px solid var(--glass-border-gold);
+  padding:10px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;
+  box-shadow:var(--glass-highlight);
+}
+#header h1{font-size:15px;color:#c9aa71;font-weight:700;flex:1;display:flex;align-items:center;gap:7px}
+.btn{padding:6px 13px;border-radius:10px;border:none;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s cubic-bezier(.4,0,.2,1);font-family:inherit;display:inline-flex;align-items:center;gap:5px}
+.btn-gold{background:linear-gradient(135deg,rgba(201,170,113,.9),rgba(168,136,78,.9));color:#0e0c09;box-shadow:0 2px 12px rgba(201,170,113,.25),inset 0 1px 0 rgba(255,255,255,.2);backdrop-filter:blur(8px)}
+.btn-gold:hover{background:linear-gradient(135deg,rgba(212,186,130,1),rgba(184,152,94,1));transform:translateY(-1px);box-shadow:0 4px 16px rgba(201,170,113,.35)}
+.btn-ghost{background:rgba(255,255,255,.05);color:#e8d5b0;border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.btn-ghost:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.15)}
+.btn-red{background:rgba(150,41,41,.6);color:#fff;border:1px solid rgba(200,60,60,.15);backdrop-filter:blur(8px)}
+.btn-red:hover{background:rgba(180,50,50,.8)}
+.btn-blue{background:rgba(74,127,163,.6);color:#fff;border:1px solid rgba(100,160,200,.15);backdrop-filter:blur(8px)}
+.btn-blue:hover{background:rgba(90,150,190,.8)}
+.btn-green{background:rgba(78,145,96,.6);color:#fff;border:1px solid rgba(100,180,120,.15);backdrop-filter:blur(8px)}
+.btn-green:hover{background:rgba(90,165,110,.8)}
+
+/* ── Layout ─────────────────────────────────────────────── */
+#mainContent{display:flex;flex:1;overflow:hidden;position:relative;min-height:0}
+#gameArea{flex:1;position:relative;display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;contain:layout}
+canvas{width:100%;height:100%;flex:1;display:block;cursor:pointer;touch-action:none;min-height:0}
+
+/* ── Game info bar ──────────────────────────────────────── */
+#gameInfo{
+  background:var(--glass-bg);
+  backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);
+  border-top:1px solid var(--glass-border-gold);
+  padding:7px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0;min-height:42px;overflow-x:auto;overflow-y:hidden;
+  box-shadow:var(--glass-highlight);
+}
+.info-block{display:flex;align-items:center;gap:5px;font-size:12px}
+.info-label{color:#7a6640;font-weight:600}
+.info-value{color:#e8d5b0;font-weight:700}
+.turn-dot{display:inline-block;width:10px;height:10px;border-radius:50%;animation:tdot 1.5s ease-in-out infinite;box-shadow:0 0 6px currentColor}
+.dot-white{background:#f0e6d2;color:#f0e6d2}
+.dot-black{background:#3a2e20;color:#3a2e20}
+@keyframes tdot{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+#sidebar{
+  width:280px;min-width:280px;
+  background:var(--glass-bg2);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  border-left:1px solid var(--glass-border-gold);
+  display:flex;flex-direction:column;flex-shrink:0;
+  box-shadow:inset 1px 0 0 rgba(255,255,255,.04);
+}
+.sb-tab-bar{display:flex;border-bottom:1px solid var(--glass-border-gold);flex-shrink:0;background:rgba(0,0,0,.15)}
+.sb-tab{flex:1;padding:9px 6px;font-size:11px;font-weight:700;text-align:center;cursor:pointer;color:#7a6640;transition:.15s;text-transform:uppercase;letter-spacing:.06em;position:relative}
+.sb-tab.active{color:#c9aa71;border-bottom:2px solid #c9aa71}
+.sb-tab:hover:not(.active){color:#b09a6e}
+.sb-panel{flex:1;overflow-y:auto;display:none;flex-direction:column}
+.sb-panel.active{display:flex}
+
+/* Online players panel */
+#onlinePanel{padding:10px;gap:6px}
+.online-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#7a6640;padding:4px 2px;flex-shrink:0}
+.player-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,.03);border-radius:12px;border:1px solid rgba(255,255,255,.04);transition:all .2s;cursor:default;backdrop-filter:blur(4px)}
+.player-row:hover{background:rgba(255,255,255,.07);border-color:var(--glass-border-gold);box-shadow:var(--glass-shadow-sm)}
+.player-av{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden;flex-shrink:0;position:relative}
+.player-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.player-av-online{position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:#4e9160;border:1.5px solid #0e0c09}
+.player-av-online.away{background:#d4a017}
+.player-av-online.dnd{background:#962929}
+.player-info{flex:1;min-width:0}
+.player-name{font-size:12px;font-weight:600;color:#e8d5b0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.player-status{font-size:10px;color:#7a6640;margin-top:1px}
+.invite-btn{padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:none;font-family:inherit;background:rgba(78,145,96,.15);color:#4e9160;border:1px solid rgba(78,145,96,.2);transition:all .2s;flex-shrink:0;white-space:nowrap;backdrop-filter:blur(4px)}
+.invite-btn:hover{background:rgba(78,145,96,.3);box-shadow:0 2px 8px rgba(78,145,96,.15)}
+.invite-btn:disabled{opacity:.4;cursor:default}
+.invite-btn.pending{background:rgba(201,170,113,.15);color:#c9aa71;border-color:rgba(201,170,113,.25)}
+.invite-btn.cancel{background:rgba(150,41,41,.2);color:#e05252;border-color:rgba(150,41,41,.3)}
+.no-players{padding:20px;text-align:center;color:#7a6640;font-size:12px;line-height:1.7}
+
+/* Chat panel */
+#chatPanel{flex:1;display:none;flex-direction:column}
+#chatPanel.active{display:flex}
+#chatMessages{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px}
+.chat-msg{padding:7px 9px;background:rgba(255,255,255,.03);border-radius:10px;font-size:12px;line-height:1.5;animation:msgIn .18s ease-out;border:1px solid rgba(255,255,255,.03);backdrop-filter:blur(4px)}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.chat-msg.sys{background:rgba(201,170,113,.06);border-left:2px solid rgba(201,170,113,.5);border-color:rgba(201,170,113,.1);color:#c9aa71;font-style:italic}
+.chat-author{font-weight:700;color:#c9aa71}
+.chat-time{font-size:9px;color:#5a4630;float:right;margin-left:6px;margin-top:2px}
+#chatInputArea{border-top:1px solid var(--glass-border-gold);padding:8px;display:flex;gap:6px;flex-shrink:0;background:rgba(0,0,0,.15)}
+#chatTextarea{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:7px 9px;color:#e8d5b0;font-size:12px;font-family:inherit;resize:none;outline:none;max-height:60px;backdrop-filter:blur(4px);transition:border-color .2s}
+#chatTextarea:focus{border-color:rgba(201,170,113,.3);box-shadow:0 0 0 2px rgba(201,170,113,.08)}
+#chatSendBtn{padding:7px 12px;background:rgba(201,170,113,.85);color:#0e0c09;border:none;border-radius:10px;cursor:pointer;font-weight:700;font-size:12px;transition:all .2s;flex-shrink:0;align-self:flex-end;backdrop-filter:blur(4px)}
+#chatSendBtn:hover{background:rgba(201,170,113,1);box-shadow:0 2px 8px rgba(201,170,113,.3)}
+
+/* History panel */
+#histPanel{padding:10px;gap:4px}
+.hist-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#7a6640;padding:4px 2px}
+.move-item{font-size:11px;padding:4px 8px;background:rgba(255,255,255,.04);border-radius:5px;color:#b09a6e;display:flex;gap:6px}
+.move-num{color:#5a4630;font-weight:700;width:20px;flex-shrink:0}
+
+/* ── Lobby overlay ────────────────────────────────────────── */
+#lobby{
+  position:fixed;inset:0;
+  background:rgba(8,6,4,.92);
+  backdrop-filter:blur(12px) saturate(120%);-webkit-backdrop-filter:blur(12px) saturate(120%);
+  display:flex;align-items:center;justify-content:center;
+  z-index:500;padding:16px;
+  pointer-events:all;
+}
+#lobby.hidden{display:none!important;pointer-events:none!important}
+.lobby-card{
+  background:var(--glass-bg2);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  border:1px solid var(--glass-border-gold);
+  border-radius:22px;
+  padding:28px 24px;max-width:400px;width:100%;text-align:center;
+  box-shadow:var(--glass-shadow),0 0 80px rgba(201,170,113,.05);
+  position:relative;overflow:hidden;
+}
+.lobby-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,170,113,.3),transparent);
+}
+.lobby-title{font-size:22px;color:#c9aa71;font-weight:700;margin-bottom:8px}
+.lobby-sub{color:#7a6640;font-size:13px;margin-bottom:24px;line-height:1.6}
+.lobby-btns{display:flex;flex-direction:column;gap:9px}
+
+/* ── Incoming invite overlay ─────────────────────────────── */
+#inviteOverlay{
+  position:fixed;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(.92);
+  background:var(--glass-bg2);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  border:1px solid rgba(78,145,96,.3);
+  border-top:1px solid rgba(78,145,96,.5);
+  border-radius:22px;
+  padding:24px 22px 20px;
+  z-index:600;
+  display:none;
+  width:min(340px,92vw);
+  box-shadow:var(--glass-shadow),0 0 40px rgba(78,145,96,.08);
+  opacity:0;
+  transition:opacity .22s ease,transform .28s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;
+  overflow:hidden;
+}
+#inviteOverlay::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(78,145,96,.4),transparent);
+}
+#inviteOverlay.show{
+  display:block;
+  opacity:1;
+  transform:translate(-50%,-50%) scale(1);
+  pointer-events:all;
+}
+#inviteBackdrop{
+  position:fixed;inset:0;z-index:599;
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  display:none;
+}
+#inviteBackdrop.show{display:block}
+.inv-game-label{
+  text-align:center;
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  color:rgba(78,145,96,.8);margin-bottom:14px;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.inv-game-label::before,.inv-game-label::after{
+  content:'';flex:1;height:1px;background:rgba(78,145,96,.2);
+}
+.inv-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.inv-av{
+  width:52px;height:52px;border-radius:50%;
+  background:rgba(255,255,255,.08);
+  border:2px solid rgba(78,145,96,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;font-weight:700;color:#c9aa71;
+  overflow:hidden;flex-shrink:0;
+}
+.inv-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.inv-info{flex:1}
+.inv-name{font-size:15px;font-weight:700;color:#e8d5b0;margin-bottom:3px}
+.inv-desc{font-size:12px;color:#7a6640}
+.inv-timer-bar{
+  width:100%;height:3px;background:rgba(255,255,255,.08);
+  border-radius:99px;margin-bottom:14px;overflow:hidden;
+}
+.inv-timer-fill{
+  height:100%;background:rgba(78,145,96,.8);
+  border-radius:99px;width:100%;
+  transition:width 1s linear;
+}
+.inv-timer{font-size:11px;color:rgba(201,170,113,.7);text-align:center;margin-bottom:14px}
+.inv-btns{display:flex;gap:10px}
+.inv-btns button{flex:1;padding:10px;font-size:13px}
+
+/* ── Waiting overlay ─────────────────────────────────────── */
+#waitOverlay{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--glass-bg2);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border:1px solid var(--glass-border-gold);border-radius:16px;padding:14px 20px;z-index:200;display:none;align-items:center;gap:12px;box-shadow:var(--glass-shadow);white-space:nowrap}
+#waitOverlay.show{display:flex}
+.spinner{width:16px;height:16px;border:2px solid rgba(201,170,113,.3);border-top-color:#c9aa71;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.wait-text{font-size:13px;color:#c9aa71;font-weight:600}
+
+/* ── Status ──────────────────────────────────────────────── */
+#statusMsg{position:absolute;top:16px;left:50%;transform:translateX(-50%);background:var(--glass-bg2);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border:1px solid var(--glass-border-gold);border-radius:12px;padding:10px 18px;font-size:13px;font-weight:600;color:#c9aa71;z-index:150;pointer-events:none;opacity:0;transition:opacity .25s;white-space:nowrap;max-width:90%;text-align:center;box-shadow:var(--glass-shadow-sm)}
+#statusMsg.show{opacity:1}
+#gameHint{position:absolute;bottom:70px;left:50%;transform:translateX(-50%);background:rgba(201,170,113,.06);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(201,170,113,.15);border-radius:10px;padding:6px 14px;font-size:11px;color:#c9aa71;z-index:50;pointer-events:none;opacity:0;transition:opacity .25s;white-space:nowrap}
+#gameHint.show{opacity:1}
+
+/* ── Move highlights ─────────────────────────────────────── */
+.highlight-ring,.highlight-move{pointer-events:none}
+
+/* ── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:rgba(0,0,0,.1)}
+::-webkit-scrollbar-thumb{background:rgba(201,170,113,.3);border-radius:2px}
+
+/* ── Notification badge ──────────────────────────────────── */
+.n-badge{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;background:#962929;color:#fff;border-radius:8px;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 3px;border:1.5px solid #0e0c09;animation:pop .25s ease-out}
+@keyframes pop{0%{transform:scale(0)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+
+/* ── Mobile ──────────────────────────────────────────────── */
+@media(max-width:700px){
+  /* Сайдбар — полноэкранный оверлей поверх игры */
+  #sidebar{
+    position:fixed;
+    top:0;right:-100%;bottom:0;
+    width:min(300px,85vw);
+    transition:right .28s cubic-bezier(.4,0,.2,1);
+    z-index:200;
+    box-shadow:-8px 0 40px rgba(0,0,0,.9),inset 1px 0 0 rgba(255,255,255,.04);
+    min-width:0;
+  }
+  #sidebar.open{right:0}
+  #sidebarOverlay.active{display:block}
+  #toggleSidebar{display:flex!important}
+
+  /* Header компактнее */
+  #header{padding:8px 10px;gap:6px}
+  #header h1{font-size:13px}
+  .btn{padding:5px 9px;font-size:11px}
+
+  /* Gameinfo компактнее */
+  #gameInfo{padding:6px 10px;gap:8px;flex-wrap:nowrap;overflow-x:auto}
+  .info-block{flex-shrink:0}
+  .info-label,.info-value{font-size:11px}
+
+  /* Лобби — полный экран */
+  #lobby{padding:12px}
+  .lobby-card{padding:20px;max-width:100%}
+  .lobby-title{font-size:18px}
+
+  /* Invite оверлей */
+  /* inviteOverlay центрируется через transform — ничего не нужно */
+  #waitOverlay{left:10px;right:10px;transform:none;bottom:10px;white-space:normal;flex-wrap:wrap;justify-content:center;gap:8px}
+
+  /* Статус */
+  #statusMsg{font-size:11px;padding:7px 12px;top:10px}
+  #gameHint{font-size:10px;bottom:56px}
+
+  /* Игроки в панели */
+  .player-row{padding:7px 8px}
+  .invite-btn{padding:4px 8px;font-size:10px}
+}
+/* Оверлей затемнения под сайдбаром */
+#sidebarOverlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.55);
+  z-index:199;
+}
+#sidebarOverlay.active{display:block}
+#toggleSidebar{display:none}
+
+/* dvh handled in body/app base styles */
+
+/* ── Player Picker Sheet ─────────────────────────────────── */
+#playerSheet{
+  position:fixed;inset:0;z-index:600;
+  display:none;flex-direction:column;justify-content:flex-end;
+}
+#playerSheet.open{display:flex}
+#sheetBackdrop{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,.7);
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+}
+#sheetPanel{
+  position:relative;z-index:1;
+  background:var(--glass-bg2);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  border:1px solid var(--glass-border-gold);
+  border-bottom:none;
+  border-radius:22px 22px 0 0;
+  max-height:80vh;
+  display:flex;flex-direction:column;
+  box-shadow:0 -8px 40px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06);
+  animation:sheetUp .28s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+}
+#sheetPanel::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,170,113,.25),transparent);pointer-events:none;z-index:2;
+}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+#sheetHandle{
+  width:36px;height:4px;background:rgba(255,255,255,.18);
+  border-radius:2px;margin:10px auto 0;flex-shrink:0;
+}
+#sheetHeader{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px 8px;flex-shrink:0;
+}
+#sheetTitle{font-size:15px;font-weight:700;color:#c9aa71}
+#sheetClose{
+  width:28px;height:28px;border-radius:8px;
+  background:rgba(255,255,255,.07);border:none;
+  color:rgba(255,255,255,.5);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;transition:.15s;
+}
+#sheetClose:hover{background:rgba(255,255,255,.14);color:#fff}
+#sheetSearch{
+  margin:0 12px 10px;padding:9px 12px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:12px;color:#e8d5b0;
+  font-size:13px;font-family:inherit;outline:none;
+  transition:all .2s;backdrop-filter:blur(4px);
+}
+#sheetSearch:focus{border-color:rgba(201,170,113,.3);box-shadow:0 0 0 2px rgba(201,170,113,.08)}
+#sheetSearch::placeholder{color:#5a4630}
+#sheetList{
+  flex:1;overflow-y:auto;
+  padding:4px 12px 20px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.sheet-empty{
+  text-align:center;padding:32px 16px;
+  color:#5a4630;font-size:13px;line-height:1.7;
+}
+.sheet-player{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.04);
+  border-radius:14px;
+  cursor:default;
+  transition:all .2s cubic-bezier(.4,0,.2,1);
+  animation:fadeIn .18s ease-out;
+  backdrop-filter:blur(4px);
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.sheet-player:hover{background:rgba(255,255,255,.07);border-color:var(--glass-border-gold);box-shadow:var(--glass-shadow-sm)}
+.sheet-av{
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:700;color:#c9aa71;
+  overflow:hidden;flex-shrink:0;position:relative;
+}
+.sheet-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.sheet-av-dot{
+  position:absolute;bottom:0;right:0;
+  width:11px;height:11px;border-radius:50%;
+  border:2px solid rgba(16,13,10,.98);
+  background:#4e9160;
+}
+.sheet-av-dot.away{background:#d4a017}
+.sheet-av-dot.dnd{background:#962929}
+.sheet-info{flex:1;min-width:0}
+.sheet-name{
+  font-size:13px;font-weight:600;color:#e8d5b0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.sheet-status{font-size:11px;color:#5a4630;margin-top:1px}
+.sheet-btn{
+  padding:7px 14px;border-radius:11px;border:none;
+  font-size:12px;font-weight:700;cursor:pointer;
+  font-family:inherit;white-space:nowrap;
+  transition:all .2s cubic-bezier(.4,0,.2,1);flex-shrink:0;
+  backdrop-filter:blur(4px);
+}
+.sheet-btn-invite{
+  background:rgba(78,145,96,.7);color:#fff;
+  border:1px solid rgba(100,170,115,.15);
+  box-shadow:0 2px 8px rgba(78,145,96,.15);
+}
+.sheet-btn-invite:hover{background:rgba(90,160,108,.9);transform:scale(1.04);box-shadow:0 4px 12px rgba(78,145,96,.25)}
+.sheet-btn-pending{
+  background:rgba(201,170,113,.15);color:#c9aa71;
+  border:1px solid rgba(201,170,113,.25);
+  cursor:default;
+}
+.sheet-btn-cancel{
+  background:rgba(150,41,41,.25);color:#e05252;
+  border:1px solid rgba(200,60,60,.25);
+}
+.sheet-btn-cancel:hover{background:rgba(180,50,50,.45)}
+.sheet-btn-dnd{
+  background:rgba(255,255,255,.05);color:#5a4630;
+  border:1px solid rgba(255,255,255,.07);
+  cursor:not-allowed;
+}
+.sheet-btn-dnd[title="Отклонил приглашение"]{
+  background:rgba(150,41,41,.15);
+  color:rgba(220,80,80,.6);
+  border-color:rgba(150,41,41,.2);
+}
+.sheet-section-title{
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.08em;color:#5a4630;padding:4px 2px;
+  flex-shrink:0;
+}
+
+/* ── Wait banner (в игре пока ждём ответа) ────────────────── */
+#waitBanner{
+  position:fixed;top:60px;left:50%;transform:translateX(-50%);
+  background:var(--glass-bg2);
+  backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);
+  border:1px solid var(--glass-border-gold);
+  border-radius:14px;padding:10px 16px;
+  z-index:300;display:none;
+  align-items:center;gap:10px;
+  box-shadow:var(--glass-shadow-sm);
+  white-space:nowrap;
+  animation:slideDown .22s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes slideDown{from{opacity:0;transform:translateX(-50%) translateY(-12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+#waitBanner.show{display:flex}
+.wait-av{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden;flex-shrink:0}
+.wait-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.wait-label{font-size:12px;color:#c9aa71;font-weight:600}
+.wait-spinner{width:14px;height:14px;border:2px solid rgba(201,170,113,.3);border-top-color:#c9aa71;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <h1><svg viewBox="0 0 24 24" width="18" height="18" style="flex-shrink:0"><circle cx="12" cy="12" r="10" stroke="#c9aa71" stroke-width="1.6" fill="none"/><circle cx="12" cy="12" r="5" stroke="#c9aa71" stroke-width="1.6" fill="none"/><circle cx="12" cy="12" r="1.5" fill="#c9aa71"/></svg>3D Шашки</h1>
+    <button class="btn btn-ghost" id="toggleSidebar" onclick="toggleSidebar()">☰</button>
+    <button class="btn btn-ghost" onclick="resetCamera()">📷</button>
+    <button class="btn btn-ghost" id="newGameBtn" onclick="showLobby()">🎮 Меню</button>
+  </div>
+
+  <div id="mainContent">
+    <!-- Canvas -->
+    <div id="gameArea">
+      <canvas id="c3d"></canvas>
+      <div id="statusMsg"></div>
+      <div id="gameHint"></div>
+      <div id="gameInfo" style="display:none">
+        <div class="info-block">
+          <span class="info-label">Ход:</span>
+          <span class="turn-dot dot-white" id="turnDot"></span>
+          <span class="info-value" id="turnText">Белые</span>
+        </div>
+        <div class="info-block">
+          <span class="info-label">⬜</span><span class="info-value" id="wCount">12</span>
+        </div>
+        <div class="info-block">
+          <span class="info-label">⬛</span><span class="info-value" id="bCount">12</span>
+        </div>
+        <div class="info-block" style="margin-left:auto">
+          <span class="info-value" id="modeText">—</span>
+        </div>
+        <button class="btn btn-red" onclick="forfeit()" style="padding:5px 10px;font-size:11px">🏳 Сдаться</button>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebarOverlay" onclick="closeSidebar()"></div>
+    <div id="sidebar">
+      <div class="sb-tab-bar">
+        <div class="sb-tab active" id="tab-online" onclick="showTab('online')">
+          <span style="position:relative">Игроки<span id="onlineBadge" style="display:none" class="n-badge"></span></span>
+        </div>
+        <div class="sb-tab" id="tab-chat" onclick="showTab('chat')">Чат</div>
+        <div class="sb-tab" id="tab-hist" onclick="showTab('hist')">История</div>
+      </div>
+      <!-- Online players -->
+      <div class="sb-panel active" id="onlinePanel">
+        <div class="no-players" id="noPlayers">Загрузка игроков…</div>
+      </div>
+      <!-- Chat -->
+      <div class="sb-panel" id="chatPanel">
+        <div id="chatMessages"></div>
+        <div id="chatInputArea">
+          <textarea id="chatTextarea" placeholder="Сообщение…" rows="1" maxlength="200"></textarea>
+          <button id="chatSendBtn" onclick="sendChat()">➤</button>
+        </div>
+      </div>
+      <!-- History -->
+      <div class="sb-panel" id="histPanel">
+        <div class="hist-title">📜 История ходов</div>
+        <div id="histList"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Lobby -->
+    <div id="lobby">
+      <div class="lobby-card">
+        <div style="font-size:40px;margin-bottom:12px">♟️</div>
+        <div class="lobby-title">3D Шашки</div>
+        <div class="lobby-sub">Русские шашки с 3D-графикой.<br>Играйте с живыми соперниками или с ИИ.</div>
+        <div class="lobby-btns">
+          <button class="btn btn-gold" style="width:100%;justify-content:center;padding:12px;font-size:14px" onclick="openPlayerSheet()">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+            Играть онлайн
+          </button>
+          <button class="btn btn-ghost" style="width:100%;justify-content:center;padding:12px;font-size:14px" onclick="startVsAI()">
+            <svg viewBox="0 0 24 24" width="16" height="16"><rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M7 12h10M12 7v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Играть с ИИ
+          </button>
+        </div>
+        <div id="lobbyOnlineCount" style="margin-top:14px;font-size:11px;color:#5a4630"></div>
+      </div>
+    </div>
+
+<!-- Incoming invite overlay -->
+<div id="inviteBackdrop"></div>
+<div id="inviteOverlay">
+  <div class="inv-game-label">♟ Приглашение в шашки</div>
+  <div class="inv-header">
+    <div class="inv-av" id="invAv">?</div>
+    <div class="inv-info">
+      <div class="inv-name" id="invName">Игрок</div>
+      <div class="inv-desc">приглашает вас сыграть в шашки</div>
+    </div>
+  </div>
+  <div class="inv-timer-bar"><div class="inv-timer-fill" id="invTimerFill"></div></div>
+  <div class="inv-timer" id="invTimer">30 сек…</div>
+  <div class="inv-btns">
+    <button class="btn btn-green" onclick="acceptInvite()">✓ Принять</button>
+    <button class="btn btn-red" onclick="rejectInvite()">✕ Отклонить</button>
+  </div>
+</div>
+
+<!-- Waiting overlay -->
+<div id="waitOverlay">
+  <div class="spinner"></div>
+  <span class="wait-text" id="waitText">Ожидание ответа…</span>
+  <button class="btn btn-ghost" style="padding:5px 10px;font-size:11px" onclick="cancelInviteSent()">Отмена</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════
+// TES3 BRIDGE
+// ═══════════════════════════════════════════════════════════
+class TES3Bridge {
+  constructor(){
+    this._p={};this._id=0;
+    window.addEventListener('message',e=>{
+      if(!e.data?.tes3||!e.data.callId) return;
+      const{callId,result}=e.data;
+      if(this._p[callId]){this._p[callId](result);delete this._p[callId];}
+    });
+  }
+  call(action,params={}){
+    return new Promise(resolve=>{
+      const id=++this._id;
+      this._p[id]=resolve;
+      window.parent.postMessage({tes3:true,callId:id,action,...params},'*');
+    });
+  }
+}
+const bridge=new TES3Bridge();
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+const ME={id:null,name:'',avatar:''};
+const GAME={
+  mode:null,myColor:null,opponentId:null,opponentName:'',opponentAvatar:'',
+  currentTurn:'white',board:[],selected:null,moves:[],history:[],
+  over:false,winner:null,id:null,
+};
+const INVITE={
+  // Входящее
+  fromId:null,fromName:'',fromAvatar:'',gameId:null,timer:null,timerSec:30,
+  // Исходящее
+  toId:null,toName:'',toAvatar:'',sentTimer:null,
+};
+// Игроки которые отклонили/заблокировали приглашения в этой сессии
+// { userId: { name, ts, reason: 'rejected'|'accepted' } }
+const SESSION_BLOCKED = new Map();
+let onlinePlayers=[];
+let lastGameSig=0;
+let pollTimer=null;
+let heartbeatTimer=null;
+let gameSigTimer=null;
+
+// ═══════════════════════════════════════════════════════════
+// THREE.JS SCENE
+// ═══════════════════════════════════════════════════════════
+let scene,camera,renderer,raycaster,mouse3;
+let pieceMeshes={},selHighlight=null,moveHighlights=[];
+const BOARD_OFFSET=3.5;
+
+function init3D(){
+  const cv=document.getElementById('c3d');
+
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x0e0c09);
+  // Убираем туман — он делает доску тёмной
+  // scene.fog=new THREE.Fog(0x0e0c09,20,60);
+
+  // Начальные размеры — берём реальные из DOM
+  const W=cv.clientWidth||window.innerWidth;
+  const H=cv.clientHeight||(window.innerHeight-100);
+
+  camera=new THREE.PerspectiveCamera(50,W/Math.max(H,1),.1,100);
+  camera.position.set(0,12,12);camera.lookAt(0,0,0);
+
+  renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:false});
+  // false = не трогать CSS размер canvas, Three.js управляет только буфером
+  renderer.setSize(W,H,false);
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.shadowMap.enabled=true;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.outputColorSpace=THREE.SRGBColorSpace||THREE.LinearSRGBColorSpace||'srgb';
+
+  // Освещение — ярче чтобы доска не была тёмной
+  scene.add(new THREE.AmbientLight(0xffffff,.7));
+  const dl=new THREE.DirectionalLight(0xfff8f0,1.0);
+  dl.position.set(5,10,7);dl.castShadow=true;
+  dl.shadow.camera.left=dl.shadow.camera.bottom=-10;
+  dl.shadow.camera.right=dl.shadow.camera.top=10;
+  dl.shadow.mapSize.width=dl.shadow.mapSize.height=1024;
+  scene.add(dl);
+  const fl=new THREE.DirectionalLight(0xfff0e0,.4);
+  fl.position.set(-4,8,-4);scene.add(fl);
+
+  raycaster=new THREE.Raycaster();
+  mouse3=new THREE.Vector2();
+
+  buildBoard();
+  cv.addEventListener('click',onCanvasClick);
+  cv.addEventListener('touchstart',e=>{
+    if(e.touches.length!==1) return;
+    const t=e.touches[0];
+    onCanvasClick({clientX:t.clientX,clientY:t.clientY,target:e.target});
+    e.preventDefault();
+  },{passive:false});
+  window.addEventListener('resize',onResize);
+
+  // Render loop
+  (function loop(){requestAnimationFrame(loop);
+    // Синхронизируем буфер рендерера с CSS-размером canvas
+    const W2=cv.clientWidth,H2=cv.clientHeight;
+    if(W2>0&&H2>0&&(renderer.domElement.width!==W2||renderer.domElement.height!==H2)){
+      renderer.setSize(W2,H2,false);
+      camera.aspect=W2/H2;camera.updateProjectionMatrix();
+    }
+    renderer.render(scene,camera);
+  })();
+}
+
+function buildBoard(){
+  const g=new THREE.Group();
+  // Board frame
+  const f=new THREE.Mesh(
+    new THREE.BoxGeometry(9.4,.6,9.4),
+    new THREE.MeshStandardMaterial({color:0x1e140a,roughness:.75,metalness:.05})
+  );
+  f.position.y=-.3;f.receiveShadow=true;g.add(f);
+  // Inner border glow
+  const bi=new THREE.Mesh(
+    new THREE.BoxGeometry(8.2,.05,8.2),
+    new THREE.MeshStandardMaterial({color:0xc9aa71,roughness:.5,metalness:.4,emissive:0xc9aa71,emissiveIntensity:.06})
+  );
+  bi.position.y=.02;g.add(bi);
+  // Cells
+  for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+    const light=(r+c)%2===0;
+    const m=new THREE.Mesh(
+      new THREE.BoxGeometry(1,.08,1),
+      new THREE.MeshStandardMaterial({
+        color:light?0xf2e8d6:0x2e2010,
+        roughness:light?.7:.85,metalness:.04
+      })
+    );
+    m.position.set(c-BOARD_OFFSET,.04,r-BOARD_OFFSET);
+    m.receiveShadow=true;
+    m.userData={type:'cell',row:r,col:c};
+    g.add(m);
+  }
+  scene.add(g);
+}
+
+function makePieceMesh(type,r,c){
+  const isKing=type.includes('king');
+  const isWhite=type.includes('white');
+  const g=new THREE.Group();
+
+  // Main disc
+  const disc=new THREE.Mesh(
+    new THREE.CylinderGeometry(.34,.4,.16,32),
+    new THREE.MeshStandardMaterial({
+      color:isWhite?0xf2e8d4:0x18110a,
+      roughness:isWhite?.55:.7,
+      metalness:isWhite?.15:.05,
+    })
+  );
+  disc.castShadow=disc.receiveShadow=true;g.add(disc);
+
+  // Edge rim
+  const rim=new THREE.Mesh(
+    new THREE.TorusGeometry(.35,.025,8,32),
+    new THREE.MeshStandardMaterial({
+      color:isWhite?0xfff8f0:0x3a2a18,
+      roughness:.3,metalness:.6,
+      emissive:isWhite?0xfff0e0:0x1a0e04,emissiveIntensity:.08
+    })
+  );
+  rim.rotation.x=Math.PI/2;rim.position.y=.08;g.add(rim);
+
+  // Top face pattern
+  const top=new THREE.Mesh(
+    new THREE.CircleGeometry(.28,32),
+    new THREE.MeshStandardMaterial({
+      color:isWhite?0xfff0de:0x241810,
+      roughness:isWhite?.4:.6,metalness:.1,
+    })
+  );
+  top.rotation.x=-Math.PI/2;top.position.y=.082;g.add(top);
+
+  // King crown
+  if(isKing){
+    const cg=new THREE.CylinderGeometry(.18,.24,.22,6);
+    const cm=new THREE.MeshStandardMaterial({
+      color:0xc9aa71,roughness:.2,metalness:.8,
+      emissive:0xc9aa71,emissiveIntensity:.35
+    });
+    const crown=new THREE.Mesh(cg,cm);
+    crown.position.y=.2;crown.castShadow=true;g.add(crown);
+    // Crown glow
+    const gl=new THREE.PointLight(0xc9aa71,.4,1.2);
+    gl.position.y=.3;g.add(gl);
+  }
+
+  g.position.set(c-BOARD_OFFSET,.5,r-BOARD_OFFSET);
+  g.userData={type:'piece',pType:type,row:r,col:c};
+  return g;
+}
+
+function renderBoard(){
+  Object.values(pieceMeshes).forEach(m=>scene.remove(m));
+  pieceMeshes={};
+  GAME.board.forEach((row,r)=>row.forEach((cell,c)=>{
+    if(cell){
+      const m=makePieceMesh(cell,r,c);
+      scene.add(m);pieceMeshes[`${r},${c}`]=m;
+    }
+  }));
+  updateCounts();
+}
+
+function clearHL(){
+  if(selHighlight){scene.remove(selHighlight);selHighlight=null;}
+  moveHighlights.forEach(h=>scene.remove(h));moveHighlights=[];
+}
+
+function hlSelect(r,c){
+  clearHL();
+  const ring=new THREE.Mesh(
+    new THREE.RingGeometry(.41,.48,32),
+    new THREE.MeshBasicMaterial({color:0xc9aa71,side:THREE.DoubleSide,transparent:true,opacity:.92})
+  );
+  ring.rotation.x=-Math.PI/2;ring.position.set(c-BOARD_OFFSET,.12,r-BOARD_OFFSET);
+  ring.userData={type:'hlSelect'};
+  scene.add(ring);selHighlight=ring;
+}
+
+function hlMoves(moves){
+  moves.forEach(mv=>{
+    const isCapture=mv.captures?.length>0;
+    const h=new THREE.Mesh(
+      new THREE.CircleGeometry(isCapture?.32:.27,32),
+      new THREE.MeshBasicMaterial({
+        color:isCapture?0xff5252:0x4e9160,
+        side:THREE.DoubleSide,transparent:true,opacity:.78
+      })
+    );
+    h.rotation.x=-Math.PI/2;h.position.set(mv.col-BOARD_OFFSET,.11,mv.row-BOARD_OFFSET);
+    h.userData={type:'moveTarget',row:mv.row,col:mv.col};
+    scene.add(h);moveHighlights.push(h);
+  });
+  if(moves.length) showHint(`${moves.length} ${moves[0]?.captures?.length?'взятий':'ходов'} — нажмите на цель`);
+}
+
+function animPieceMove(fr,fc,tr,tc,cb){
+  const key=`${fr},${fc}`;const m=pieceMeshes[key];
+  if(!m){cb&&cb();return;}
+  const s=m.position.clone(),e=new THREE.Vector3(tc-BOARD_OFFSET,.5,tr-BOARD_OFFSET);
+  const t0=Date.now(),dur=480;
+  (function frame(){
+    const p=Math.min((Date.now()-t0)/dur,1);
+    m.position.lerpVectors(s,e,p);
+    m.position.y=.5+Math.sin(p*Math.PI)*1.3;
+    if(p<1) requestAnimationFrame(frame);
+    else{m.position.copy(e);m.position.y=.5;delete pieceMeshes[key];pieceMeshes[`${tr},${tc}`]=m;m.userData.row=tr;m.userData.col=tc;cb&&cb();}
+  })();
+}
+
+function animRemovePiece(r,c,cb){
+  const m=pieceMeshes[`${r},${c}`];
+  if(!m){cb&&cb();return;}
+  const t0=Date.now(),sy=m.position.y;
+  (function frame(){
+    const p=Math.min((Date.now()-t0)/280,1);
+    m.position.y=sy-p*2.5;m.scale.setScalar(1-p*.6);
+    if(p<1) requestAnimationFrame(frame);
+    else{scene.remove(m);delete pieceMeshes[`${r},${c}`];cb&&cb();}
+  })();
+}
+
+function animKingCrown(r,c){
+  const key=`${r},${c}`;const m=pieceMeshes[key];if(!m) return;
+  const t=m.userData.pType;
+  const nt=t.includes('white')?'white-king':'black-king';
+  scene.remove(m);delete pieceMeshes[key];
+  const nm=makePieceMesh(nt,r,c);scene.add(nm);pieceMeshes[key]=nm;
+  nm.position.y=2.5;
+  const t0=Date.now();
+  (function frame(){
+    const p=Math.min((Date.now()-t0)/500,1);
+    nm.position.y=2.5-2*p;nm.rotation.y=p*Math.PI*2;
+    if(p<1) requestAnimationFrame(frame);
+    else{nm.position.y=.5;nm.rotation.y=0;}
+  })();
+  showStatus('👑 Дамка!',2000);
+}
+
+function onResize(){
+  fixCanvasSize();
+}
+
+function resetCamera(){
+  if(!camera) return;
+  if(GAME.myColor==='black'){
+    camera.position.set(0,13,-13);
+  } else {
+    camera.position.set(0,13,13);
+  }
+  camera.lookAt(0,0,0);
+  camera.updateProjectionMatrix();
+}
+
+// ═══════════════════════════════════════════════════════════
+// CHECKERS LOGIC
+// ═══════════════════════════════════════════════════════════
+function initBoard(){
+  GAME.board=Array(8).fill(null).map(()=>Array(8).fill(null));
+  for(let r=0;r<3;r++) for(let c=0;c<8;c++) if((r+c)%2===1) GAME.board[r][c]='black';
+  for(let r=5;r<8;r++) for(let c=0;c<8;c++) if((r+c)%2===1) GAME.board[r][c]='white';
+  GAME.currentTurn='white';GAME.selected=null;GAME.moves=[];GAME.history=[];
+  GAME.over=false;GAME.winner=null;
+  renderBoard();updateTurnUI();updateHistUI();hideHint();clearHL();
+  document.getElementById('gameInfo').style.display='flex';
+}
+
+const pColor=p=>p?(p.includes('white')?'white':'black'):null;
+const isKing=p=>!!(p&&p.includes('king'));
+
+function validMoves(r,c){
+  const p=GAME.board[r][c];if(!p) return[];
+  const col=pColor(p);
+  const caps=allCaptures(col);
+  if(caps.length) return caps.filter(m=>m.fromRow===r&&m.fromCol===c);
+  const moves=[];
+  const king=isKing(p);
+  const dirs=king?[[-1,-1],[-1,1],[1,-1],[1,1]]:col==='white'?[[-1,-1],[-1,1]]:[[1,-1],[1,1]];
+  for(const[dr,dc] of dirs){
+    if(king){
+      for(let d=1;d<8;d++){
+        const nr=r+dr*d,nc=c+dc*d;
+        if(nr<0||nr>7||nc<0||nc>7) break;
+        if(GAME.board[nr][nc]) break;
+        moves.push({row:nr,col:nc,captures:[],fromRow:r,fromCol:c});
+      }
+    } else {
+      const nr=r+dr,nc=c+dc;
+      if(nr>=0&&nr<=7&&nc>=0&&nc<=7&&!GAME.board[nr][nc])
+        moves.push({row:nr,col:nc,captures:[],fromRow:r,fromCol:c});
+    }
+  }
+  return moves;
+}
+
+function allCaptures(color){
+  const all=[];
+  for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+    const p=GAME.board[r][c];
+    if(p&&pColor(p)===color) all.push(...capturesFor(r,c));
+  }
+  return all;
+}
+
+function capturesFor(r,c,board=GAME.board,captured=[]){
+  const p=board[r][c];if(!p) return[];
+  const color=pColor(p),king=isKing(p),caps=[];
+  for(const[dr,dc] of[[-1,-1],[-1,1],[1,-1],[1,1]]){
+    if(king){
+      for(let d=1;d<7;d++){
+        const er=r+dr*d,ec=c+dc*d;
+        if(er<0||er>7||ec<0||ec>7) break;
+        const en=board[er][ec];
+        if(en){
+          if(pColor(en)!==color){
+            const ck=`${er},${ec}`;
+            if(captured.includes(ck)) break;
+            for(let ld=1;ld<8-d;ld++){
+              const lr=er+dr*ld,lc=ec+dc*ld;
+              if(lr<0||lr>7||lc<0||lc>7) break;
+              if(board[lr][lc]) break;
+              const nb=board.map(x=>[...x]);
+              nb[lr][lc]=p;nb[r][c]=null;nb[er][ec]=null;
+              const next=capturesFor(lr,lc,nb,[...captured,ck]);
+              if(next.length) caps.push(...next.map(n=>({...n,fromRow:r,fromCol:c,captures:[{row:er,col:ec},...n.captures]})));
+              else caps.push({fromRow:r,fromCol:c,row:lr,col:lc,captures:[{row:er,col:ec}]});
+            }
+          }
+          break;
+        }
+      }
+    } else {
+      const er=r+dr,ec=c+dc,lr=r+dr*2,lc=c+dc*2;
+      if(lr<0||lr>7||lc<0||lc>7) continue;
+      const en=board[er][ec],land=board[lr][lc];
+      if(en&&!land&&pColor(en)!==color){
+        const ck=`${er},${ec}`;
+        if(captured.includes(ck)) continue;
+        const nb=board.map(x=>[...x]);
+        let np=p;
+        if((color==='white'&&lr===0)||(color==='black'&&lr===7)) np=color+'-king';
+        nb[lr][lc]=np;nb[r][c]=null;nb[er][ec]=null;
+        const next=capturesFor(lr,lc,nb,[...captured,ck]);
+        if(next.length) caps.push(...next.map(n=>({...n,fromRow:r,fromCol:c,captures:[{row:er,col:ec},...n.captures]})));
+        else caps.push({fromRow:r,fromCol:c,row:lr,col:lc,captures:[{row:er,col:ec}]});
+      }
+    }
+  }
+  return caps;
+}
+
+function makeMove(fr,fc,tr,tc,captures=[]){
+  const p=GAME.board[fr][fc];if(!p) return;
+  const color=pColor(p);
+  let np=p;
+  if(!isKing(p)&&((color==='white'&&tr===0)||(color==='black'&&tr===7))) np=color+'-king';
+
+  animPieceMove(fr,fc,tr,tc,()=>{
+    GAME.board[tr][tc]=np;GAME.board[fr][fc]=null;
+    if(captures.length){
+      captures.forEach((cap,i)=>{
+        setTimeout(()=>{
+          animRemovePiece(cap.row,cap.col,()=>{
+            GAME.board[cap.row][cap.col]=null;
+            if(i===captures.length-1){
+              if(np!==p) setTimeout(()=>animKingCrown(tr,tc),80);
+              renderBoard();checkGameOver();
+              if(!GAME.over) switchTurn();
+            }
+          });
+        },i*180);
+      });
+    } else {
+      if(np!==p) setTimeout(()=>animKingCrown(tr,tc),80);
+      renderBoard();checkGameOver();
+      if(!GAME.over) switchTurn();
+    }
+  });
+
+  const nota=`${posN(fr,fc)}${captures.length?':':'-'}${posN(tr,tc)}`;
+  GAME.history.push({nota,turn:GAME.currentTurn,fr,fc,tr,tc,captures});
+  updateHistUI();clearHL();
+}
+
+function posN(r,c){return Math.floor((r*8+c+(r%2))/2)+1;}
+
+function switchTurn(){
+  GAME.currentTurn=GAME.currentTurn==='white'?'black':'white';
+  GAME.selected=null;GAME.moves=[];
+  updateTurnUI();hideHint();
+  if(GAME.mode==='ai'&&GAME.currentTurn==='black') setTimeout(aiMove,700);
+}
+
+function updateTurnUI(){
+  const dot=document.getElementById('turnDot');
+  const txt=document.getElementById('turnText');
+  const mode=document.getElementById('modeText');
+  dot.className='turn-dot '+(GAME.currentTurn==='white'?'dot-white':'dot-black');
+  txt.textContent=GAME.currentTurn==='white'?'Белые':'Чёрные';
+  if(GAME.mode==='ai') mode.textContent='🤖 vs ИИ';
+  else if(GAME.mode==='pvp'){
+    const isMyTurn=GAME.currentTurn===GAME.myColor;
+    mode.textContent=isMyTurn?'✅ Ваш ход':'⏳ Ход противника';
+  } else mode.textContent='—';
+}
+
+function updateCounts(){
+  let w=0,b=0;
+  GAME.board.forEach(row=>row.forEach(c=>{if(c){pColor(c)==='white'?w++:b++;}}));
+  document.getElementById('wCount').textContent=w;
+  document.getElementById('bCount').textContent=b;
+  return{w,b};
+}
+
+function updateHistUI(){
+  const el=document.getElementById('histList');
+  el.innerHTML='';
+  GAME.history.forEach((m,i)=>{
+    const d=document.createElement('div');
+    d.className='move-item';
+    d.innerHTML=`<span class="move-num">${i+1}</span><span>${m.nota}</span>`;
+    el.appendChild(d);
+  });
+  el.scrollTop=el.scrollHeight;
+}
+
+function checkGameOver(){
+  const{w,b}=updateCounts();
+  const wMoves=allMovesColor('white'),bMoves=allMovesColor('black');
+  if(w===0||wMoves.length===0){endGame('black');return true;}
+  if(b===0||bMoves.length===0){endGame('white');return true;}
+  return false;
+}
+
+function allMovesColor(color){
+  const all=[];
+  for(let r=0;r<8;r++) for(let c=0;c<8;c++){
+    const p=GAME.board[r][c];
+    if(p&&pColor(p)===color) all.push(...validMoves(r,c));
+  }
+  return all;
+}
+
+function endGame(winner){
+  GAME.over=true;GAME.winner=winner;
+  const isWin=winner===GAME.myColor;
+  const msg=isWin?'🏆 Вы победили!':GAME.mode==='ai'?'🤖 ИИ победил!':`🏆 ${GAME.opponentName} победил!`;
+  showStatus(msg,0);
+  addChat('СИСТЕМА',msg,true);
+  bridge.call('notify',{title:'🏆 Игра окончена',text:msg,opts:{icon:'♟️',dotColor:isWin?'green':'red'}});
+  if(GAME.mode==='pvp') sendGameSignal('game_over',{winner,gameId:GAME.id});
+  setTimeout(()=>{
+    if(confirm(msg+'\n\nСыграть ещё раз?')) showLobby();
+  },1200);
+}
+
+function forfeit(){
+  if(!confirm('Сдаться?')) return;
+  const winner=GAME.myColor==='white'?'black':'white';
+  if(GAME.mode==='pvp') sendGameSignal('game_over',{winner,forfeit:true,gameId:GAME.id});
+  endGame(winner);
+}
+
+// ═══════════════════════════════════════════════════════════
+// CANVAS INPUT
+// ═══════════════════════════════════════════════════════════
+function onCanvasClick(e){
+  if(GAME.over){showStatus('🏁 Игра окончена',2000);return;}
+  if(GAME.mode==='pvp'&&GAME.currentTurn!==GAME.myColor){showStatus('⏳ Ход противника',1800);return;}
+  if(!GAME.mode) return;
+
+  const cv=e.target||document.getElementById('c3d');
+  const rect=cv.getBoundingClientRect();
+  mouse3.x=((e.clientX-rect.left)/rect.width)*2-1;
+  mouse3.y=-((e.clientY-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera(mouse3,camera);
+
+  const all=[...scene.children,...Object.values(pieceMeshes),...moveHighlights,selHighlight].filter(Boolean);
+  const hits=raycaster.intersectObjects(all,true);
+  if(!hits.length){clearHL();GAME.selected=null;GAME.moves=[];hideHint();return;}
+
+  for(const hit of hits){
+    let t=hit.object;
+    while(t.parent&&!t.userData?.type) t=t.parent;
+    const d=t.userData;
+    if(d.type==='moveTarget'){onMoveTarget(d.row,d.col);return;}
+    if(d.type==='piece'){onPiece(d.row,d.col);return;}
+    if(d.type==='cell'&&GAME.selected){onCell(d.row,d.col);return;}
+  }
+}
+
+function onPiece(r,c){
+  const p=GAME.board[r][c];if(!p) return;
+  if(pColor(p)!==GAME.currentTurn){showStatus('⚠️ Чужая шашка',1500);return;}
+  GAME.selected={r,c};GAME.moves=validMoves(r,c);
+  if(!GAME.moves.length){showStatus('❌ Нет ходов',1500);clearHL();return;}
+  hlSelect(r,c);hlMoves(GAME.moves);
+}
+
+function onCell(r,c){
+  if(!GAME.selected) return;
+  const mv=GAME.moves.find(m=>m.row===r&&m.col===c);
+  if(!mv){showStatus('❌ Недопустимый ход',1500);return;}
+  execMove(mv);
+}
+
+function onMoveTarget(r,c){
+  if(!GAME.selected) return;
+  const mv=GAME.moves.find(m=>m.row===r&&m.col===c);
+  if(!mv) return;
+  execMove(mv);
+}
+
+function execMove(mv){
+  const{r:fr,c:fc}=GAME.selected;
+  makeMove(fr,fc,mv.row,mv.col,mv.captures);
+  if(GAME.mode==='pvp') sendGameSignal('game_move',{gameId:GAME.id,from:{r:fr,c:fc},to:{r:mv.row,c:mv.col},captures:mv.captures,player:ME.name});
+  hideHint();
+}
+
+// ═══════════════════════════════════════════════════════════
+// AI
+// ═══════════════════════════════════════════════════════════
+function aiMove(){
+  const moves=allMovesColor('black');
+  if(!moves.length){endGame('white');return;}
+  const caps=moves.filter(m=>m.captures.length);
+  const pool=caps.length?caps:moves;
+  let best=pool[0],bs=-Infinity;
+  pool.forEach(m=>{
+    let s=m.captures.length*120+(7-m.row)*4+(isKing(GAME.board[m.fromRow][m.fromCol])?40:0)+Math.random()*12;
+    if(s>bs){bs=s;best=m;}
+  });
+  makeMove(best.fromRow,best.fromCol,best.row,best.col,best.captures);
+  addChat('ИИ',`Ход: ${posN(best.fromRow,best.fromCol)}${best.captures.length?':':'-'}${posN(best.row,best.col)}`);
+}
+
+// ═══════════════════════════════════════════════════════════
+// MULTIPLAYER — INVITE SYSTEM
+// ═══════════════════════════════════════════════════════════
+async function sendGameInvite(toId,toName,toAvatar){
+  if(GAME.mode) return;
+  if(INVITE.toId) cancelInviteSent();
+
+  INVITE.toId=toId;INVITE.toName=toName;INVITE.toAvatar=toAvatar||'';
+
+  const gameId=Date.now()+'_'+ME.id;
+  INVITE.gameId=gameId;
+
+  // Скрываем лобби и показываем доску с wait banner
+  hideLobby();
+
+  // Wait banner
+  const banner=document.getElementById('waitBanner');
+  const bannerAv=document.getElementById('waitBannerAv');
+  const bannerTxt=document.getElementById('waitBannerText');
+  if(banner){
+    if(toAvatar&&toAvatar.startsWith('http'))
+      bannerAv.innerHTML=`<img src="${esc(toAvatar)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    else bannerAv.textContent=toName?toName[0].toUpperCase():'?';
+    bannerTxt.textContent=`Ожидание ответа от ${toName}…`;
+    banner.classList.add('show');
+  }
+
+  try{
+    await bridge.call('game_invite',{
+      toUserId:toId,game:'checkers3d',
+      data:JSON.stringify({gameId,fromName:ME.name,fromAvatar:ME.avatar})
+    });
+  }catch(e){ console.warn('game_invite error:',e); }
+
+  // Timeout 30 sec
+  INVITE.sentTimer=setTimeout(()=>{
+    if(INVITE.toId===toId){
+      cancelInviteSent();
+      bridge.call('notify',{title:'⌛ Нет ответа',text:`${toName} не ответил на приглашение`,opts:{icon:'♟️'}});
+    }
+  },30000);
+
+  updateOnlineList();
+  bridge.call('notify',{title:'📤 Приглашение отправлено',text:`Ожидание ответа от ${toName}`,opts:{icon:'♟️',dotColor:''}});
+}
+
+function cancelInviteSent(){
+  if(!INVITE.toId) return;
+  clearTimeout(INVITE.sentTimer);
+  bridge.call('game_cancel',{toUserId:INVITE.toId,game:'checkers3d'});
+  INVITE.toId=null;INVITE.gameId=null;
+  document.getElementById('waitBanner')?.classList.remove('show');
+  updateOnlineList();
+}
+
+// Incoming invite
+function showIncomingInvite(fromId,fromName,fromAvatar,gameId){
+  if(GAME.mode){
+    bridge.call('game_reject',{toUserId:fromId,game:'checkers3d'});
+    return;
+  }
+  INVITE.fromId=fromId;INVITE.fromName=fromName;INVITE.fromAvatar=fromAvatar||'';INVITE.gameId=gameId;
+  INVITE.timerSec=30;
+
+  // Аватар
+  const av=document.getElementById('invAv');
+  if(fromAvatar&&fromAvatar.startsWith('http'))
+    av.innerHTML=`<img src="${escH(fromAvatar)}" alt="">`;
+  else
+    av.textContent=fromName?fromName[0].toUpperCase():'?';
+  document.getElementById('invName').textContent=fromName;
+
+  // Показываем backdrop + overlay
+  document.getElementById('inviteBackdrop').classList.add('show');
+  document.getElementById('inviteOverlay').classList.add('show');
+
+  // Прогресс-бар таймера
+  const fill=document.getElementById('invTimerFill');
+  if(fill){ fill.style.transition='none'; fill.style.width='100%'; void fill.offsetWidth; fill.style.transition='width 30s linear'; fill.style.width='0%'; }
+
+  // Вибрация на мобильном
+  if(navigator.vibrate) navigator.vibrate([200,100,200]);
+
+  // Обратный отсчёт
+  clearInterval(INVITE.timer);
+  INVITE.timer=setInterval(()=>{
+    INVITE.timerSec--;
+    const t=document.getElementById('invTimer');
+    if(t) t.textContent=INVITE.timerSec>0?`${INVITE.timerSec} сек…`:'Время вышло';
+    if(INVITE.timerSec<=0){clearInterval(INVITE.timer);rejectInvite();}
+  },1000);
+
+  // DI уведомление
+  bridge.call('notify',{
+    title:'🎮 Приглашение в шашки!',
+    text:`${fromName} приглашает вас сыграть`,
+    opts:{icon:'♟️',dotColor:'green'}
+  });
+}
+
+async function acceptInvite(){
+  if(!INVITE.fromId) return;
+  clearInterval(INVITE.timer);
+  document.getElementById('inviteOverlay').classList.remove('show');
+  document.getElementById('inviteBackdrop').classList.remove('show');
+
+  const fromId=INVITE.fromId,fromName=INVITE.fromName,fromAvatar=INVITE.fromAvatar,gameId=INVITE.gameId;
+  INVITE.fromId=null;
+
+  await bridge.call('game_accept',{toUserId:fromId,game:'checkers3d',data:JSON.stringify({gameId,fromName:ME.name})});
+
+  SESSION_BLOCKED.set(fromId,{name:fromName,ts:Date.now(),reason:'accepted'});
+  startPvP('black',fromId,fromName,fromAvatar,gameId);
+}
+
+async function rejectInvite(){
+  if(!INVITE.fromId) return;
+  clearInterval(INVITE.timer);
+  document.getElementById('inviteOverlay').classList.remove('show');
+  document.getElementById('inviteBackdrop').classList.remove('show');
+  const rejId=INVITE.fromId, rejName=INVITE.fromName;
+  INVITE.fromId=null;
+  await bridge.call('game_reject',{toUserId:rejId,game:'checkers3d'});
+  // Блокируем повторные приглашения на эту сессию
+  SESSION_BLOCKED.set(rejId,{name:rejName,ts:Date.now(),reason:'rejected'});
+  updateOnlineList();
+  renderSheet();
+}
+
+// ═══════════════════════════════════════════════════════════
+// GAME SIGNAL HANDLERS
+// ═══════════════════════════════════════════════════════════
+function handleGameSignal(sig){
+  const{fromId,fromName,fromAvatar,type,data}=sig;
+  let d={};
+  try{d=data?JSON.parse(data):{};}catch(e){}
+
+  if(type==='game_invite'){
+    // data может быть {game,data:{gameId,...},fromName} или {gameId,fromName,fromAvatar}
+    const inner=d.data||d;
+    const gameId=inner.gameId||d.gameId||('game_'+fromId+'_'+Date.now());
+    const senderName=inner.fromName||d.fromName||fromName||'Игрок';
+    const senderAvatar=inner.fromAvatar||d.fromAvatar||fromAvatar||'';
+    // Игнорируем если игрок в SESSION_BLOCKED
+    if(SESSION_BLOCKED.has(fromId)&&SESSION_BLOCKED.get(fromId).reason==='rejected'){
+      bridge.call('game_reject',{toUserId:fromId,game:'checkers3d'});
+      return;
+    }
+    showIncomingInvite(fromId,senderName,senderAvatar,gameId);
+  }
+
+  else if(type==='game_accept'){
+    if(INVITE.toId===fromId){
+      clearTimeout(INVITE.sentTimer);
+      document.getElementById('waitOverlay').classList.remove('show');
+      const gameId=INVITE.gameId;
+      INVITE.toId=null;INVITE.gameId=null;
+      startPvP('white',fromId,d.fromName||fromName,fromAvatar,gameId);
+    }
+  }
+
+  else if(type==='game_reject'){
+    if(INVITE.toId===fromId){
+      clearTimeout(INVITE.sentTimer);
+      document.getElementById('waitBanner')?.classList.remove('show');
+      INVITE.toId=null;INVITE.gameId=null;
+      // Блокируем повторный вызов — игрок отклонил
+      SESSION_BLOCKED.set(fromId,{name:fromName,ts:Date.now(),reason:'rejected'});
+      updateOnlineList();
+      renderSheet();
+      bridge.call('notify',{title:'❌ Приглашение отклонено',text:`${fromName} не хочет играть`,opts:{icon:'♟️',dotColor:'red'}});
+      showStatus(`${fromName} отклонил приглашение`,3000);
+      showLobby();
+    }
+  }
+
+  else if(type==='game_cancel'){
+    if(INVITE.fromId===fromId){
+      clearInterval(INVITE.timer);
+      document.getElementById('inviteOverlay').classList.remove('show');
+      document.getElementById('inviteBackdrop').classList.remove('show');
+      INVITE.fromId=null;
+      showStatus(`${fromName} отменил приглашение`,2500);
+    }
+  }
+
+  else if(type==='game_move'){
+    if(GAME.mode==='pvp'&&GAME.opponentId===fromId&&d.gameId===GAME.id){
+      makeMove(d.from.r,d.from.c,d.to.r,d.to.c,d.captures||[]);
+      showStatus(`♟️ ${fromName} сделал ход`,2000);
+      bridge.call('notify',{title:'♟️ Ход противника',text:`${fromName} походил`,opts:{icon:'♟️'}});
+    }
+  }
+
+  else if(type==='game_chat'){
+    if(GAME.mode==='pvp'&&GAME.opponentId===fromId){
+      addChat(fromName,d.text||'');
+    }
+  }
+
+  else if(type==='game_over'){
+    if(GAME.mode==='pvp'&&GAME.opponentId===fromId&&!GAME.over){
+      if(d.forfeit) addChat('СИСТЕМА',`${fromName} сдался!`,true);
+      endGame(d.winner);
+    }
+  }
+}
+
+async function sendGameSignal(type,data){
+  if(!GAME.opponentId) return;
+  try{
+    await bridge.call('game_signal',{
+      toUserId:GAME.opponentId,
+      game:'checkers3d',
+      type,
+      data:JSON.stringify(data),
+    });
+  }catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════════
+// HEARTBEAT + ONLINE PLAYERS
+// ═══════════════════════════════════════════════════════════
+async function heartbeat(){
+  try{
+    const r=await bridge.call('heartbeat',{gameSince:lastGameSig});
+    if(!r?.ok) return;
+
+    // Онлайн игроки
+    if(r.online){
+      onlinePlayers=r.online.filter(u=>u.id!==ME.id&&u.status!=='invisible');
+      updateOnlineList();
+    }
+
+    // Игровые сигналы
+    if(r.gameSignals?.length){
+      for(const sig of r.gameSignals) handleGameSignal(sig);
+      lastGameSig=r.lastGameId||lastGameSig;
+    }
+  }catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════════
+// PLAYER SHEET — выпадающий список игроков
+// ═══════════════════════════════════════════════════════════
+let _sheetFilter='';
+
+function openPlayerSheet(){
+  _sheetFilter='';
+  const el=document.getElementById('sheetSearch');
+  if(el) el.value='';
+  renderSheet();
+  document.getElementById('playerSheet').classList.add('open');
+  document.getElementById('sheetSearch')?.focus();
+}
+
+function closePlayerSheet(){
+  document.getElementById('playerSheet').classList.remove('open');
+}
+
+function filterSheet(q){
+  _sheetFilter=q.toLowerCase().trim();
+  renderSheet();
+}
+
+function renderSheet(){
+  const list=document.getElementById('sheetList');
+  if(!list) return;
+
+  const all=onlinePlayers.filter(u=>u.status!=='invisible');
+  const filtered=_sheetFilter
+    ? all.filter(u=>u.name.toLowerCase().includes(_sheetFilter))
+    : all;
+
+  // Разделяем на онлайн и отошли
+  const online=filtered.filter(u=>u.status!=='away'&&u.status!=='dnd');
+  const away=filtered.filter(u=>u.status==='away');
+  const dnd=filtered.filter(u=>u.status==='dnd');
+
+  list.innerHTML='';
+
+  if(!filtered.length){
+    list.innerHTML=`<div class="sheet-empty">${_sheetFilter?'Игроков не найдено':'😴 Никого нет онлайн<br><br>Попробуйте позже или сыграйте с ИИ'}</div>`;
+    return;
+  }
+
+  const addSection=(title,players)=>{
+    if(!players.length) return;
+    const s=document.createElement('div');
+    s.className='sheet-section-title';
+    s.textContent=title+' — '+players.length;
+    list.appendChild(s);
+    players.forEach(u=>list.appendChild(makeSheetRow(u)));
+  };
+
+  addSection('В сети',online);
+  addSection('Отошёл',away);
+  addSection('Не беспокоить',dnd);
+}
+
+function makeSheetRow(u){
+  const row=document.createElement('div');
+  row.className='sheet-player';
+
+  const avInner=u.avatar&&u.avatar.startsWith('http')
+    ?`<img src="${esc(u.avatar)}" alt="">`
+    :(u.name?u.name[0].toUpperCase():'?');
+  const dotCls=u.status==='away'?'away':u.status==='dnd'?'dnd':'';
+  const statusLabel=u.status==='away'?'Отошёл':u.status==='dnd'?'Не беспокоить':'В сети';
+
+  const blocked=SESSION_BLOCKED.get(u.id);
+  let btn='';
+  if(GAME.mode){
+    btn=`<button class="sheet-btn sheet-btn-dnd" disabled>В игре</button>`;
+  } else if(INVITE.toId===u.id){
+    btn=`<button class="sheet-btn sheet-btn-cancel" onclick="cancelInviteSent()">✕ Отмена</button>`;
+  } else if(blocked?.reason==='rejected'){
+    btn=`<button class="sheet-btn sheet-btn-dnd" disabled title="Отклонил приглашение">✗ Отказал</button>`;
+  } else if(INVITE.toId){
+    btn=`<button class="sheet-btn sheet-btn-dnd" disabled>—</button>`;
+  } else if(u.status==='dnd'){
+    btn=`<button class="sheet-btn sheet-btn-dnd" disabled>🚫</button>`;
+  } else {
+    btn=`<button class="sheet-btn sheet-btn-invite" onclick="sheetInvite(${u.id},'${esc(u.name)}','${esc(u.avatar||'')}')">♟ Вызвать</button>`;
+  }
+
+  row.innerHTML=`
+    <div class="sheet-av">
+      ${avInner}
+      <div class="sheet-av-dot ${dotCls}"></div>
+    </div>
+    <div class="sheet-info">
+      <div class="sheet-name">${escH(u.name)}</div>
+      <div class="sheet-status">${statusLabel}</div>
+    </div>
+    ${btn}
+  `;
+  return row;
+}
+
+async function sheetInvite(id,name,avatar){
+  closePlayerSheet();
+  await sendGameInvite(id,name,avatar);
+}
+
+function updateOnlineList(){
+  // Обновляем счётчик в лобби
+  const cnt=document.getElementById('lobbyOnlineCount');
+  if(cnt){
+    const n=onlinePlayers.filter(u=>u.status!=='invisible').length;
+    cnt.textContent=n?`${n} игрок${n===1?'':n<5?'а':'ов'} онлайн`:'Никого онлайн';
+  }
+  // Если sheet открыт — перерисовываем
+  if(document.getElementById('playerSheet')?.classList.contains('open')) renderSheet();
+  // Сайдбар
+  const panel=document.getElementById('onlinePanel');
+  if(!panel) return;
+  const available=onlinePlayers.filter(u=>u.status!=='invisible');
+  if(!available.length){
+    panel.innerHTML='<div class="no-players">😴 Нет игроков онлайн</div>';
+    return;
+  }
+  panel.innerHTML='<div class="online-section-title">Онлайн — '+available.length+'</div>';
+  available.forEach(u=>{
+    const row=document.createElement('div');row.className='player-row';
+    const avHTML=u.avatar&&u.avatar.startsWith('http')
+      ?`<img src="${esc(u.avatar)}" alt="">`:(u.name?u.name[0].toUpperCase():'?');
+    const dotCls=u.status==='away'?'away':u.status==='dnd'?'dnd':'';
+    const statusLabel=u.status==='away'?'Отошёл':u.status==='dnd'?'Не беспокоить':'В сети';
+    const _bl=SESSION_BLOCKED.get(u.id);
+    let btnHTML='';
+    if(GAME.mode) btnHTML='<button class="invite-btn" disabled>В игре</button>';
+    else if(INVITE.toId===u.id) btnHTML=`<button class="invite-btn cancel" onclick="cancelInviteSent()">✕</button>`;
+    else if(_bl?.reason==='rejected') btnHTML='<button class="invite-btn" disabled title="Отклонил">✗</button>';
+    else if(INVITE.toId) btnHTML='<button class="invite-btn" disabled>—</button>';
+    else if(u.status==='dnd') btnHTML='<button class="invite-btn" disabled>🚫</button>';
+    else btnHTML=`<button class="invite-btn" onclick="sheetInvite(${u.id},'${esc(u.name)}','${esc(u.avatar||'')}')">♟</button>`;
+    row.innerHTML=`<div class="player-av">${avHTML}<div class="player-av-online ${dotCls}"></div></div><div class="player-info"><div class="player-name">${escH(u.name)}</div><div class="player-status">${statusLabel}</div></div>${btnHTML}`;
+    panel.appendChild(row);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// PvP GAME START
+// ═══════════════════════════════════════════════════════════
+function startPvP(myColor,oppId,oppName,oppAvatar,gameId){
+  GAME.mode='pvp';GAME.myColor=myColor;
+  GAME.opponentId=oppId;GAME.opponentName=oppName;GAME.opponentAvatar=oppAvatar||'';
+  GAME.id=gameId;
+  SESSION_BLOCKED.clear(); // новая игра — сбрасываем
+  // Скрываем все оверлеи
+  document.getElementById('waitBanner')?.classList.remove('show');
+  document.getElementById('inviteOverlay')?.classList.remove('show');
+  closePlayerSheet();
+  hideLobby();initBoard();
+  setTimeout(()=>{
+    fixCanvasSize();
+    if(myColor==='black'){camera.position.set(0,13,-13);camera.lookAt(0,0,0);}
+    else resetCamera();
+  },50);
+  updateOnlineList();
+  addChat('СИСТЕМА',`🎮 Игра началась!\nВы: ${myColor==='white'?'Белые ⬜':'Чёрные ⬛'}\nПротивник: ${oppName}`,true);
+  bridge.call('notify',{title:'🎮 Игра началась!',text:`${myColor==='white'?'Вы белые':'Вы чёрные'} против ${oppName}`,opts:{icon:'♟️',dotColor:'green'}});
+}
+
+// ═══════════════════════════════════════════════════════════
+// AI MODE
+// ═══════════════════════════════════════════════════════════
+function startVsAI(){
+  GAME.mode='ai';GAME.myColor='white';GAME.id='ai_'+Date.now();
+  SESSION_BLOCKED.clear(); // новая игра — сбрасываем блокировки
+  hideLobby();
+  if(!renderer){
+    init3D();
+    setTimeout(()=>{initBoard();fixCanvasSize();resetCamera();},150);
+    return;
+  }
+  initBoard();
+  setTimeout(()=>{fixCanvasSize();resetCamera();},50);
+  addChat('СИСТЕМА','🤖 Игра против ИИ! Вы играете белыми.',true);
+  bridge.call('toast',{message:'🤖 Игра с ИИ начата',type:'ok',duration:2000});
+}
+
+// ═══════════════════════════════════════════════════════════
+// CHAT
+// ═══════════════════════════════════════════════════════════
+function addChat(author,text,isSys=false){
+  const msgs=document.getElementById('chatMessages');
+  const d=document.createElement('div');
+  d.className='chat-msg'+(isSys?' sys':'');
+  const t=new Date().toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+  if(isSys){
+    d.innerHTML=`<span class="chat-time">${t}</span>${escH(text)}`;
+  } else {
+    d.innerHTML=`<span class="chat-author">${escH(author)}:</span> <span class="chat-time">${t}</span>${escH(text)}`;
+  }
+  msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+  // Badge if not on chat tab
+  if(!document.getElementById('tab-chat').classList.contains('active')){
+    const b=document.getElementById('tab-chat');
+    let badge=b.querySelector('.n-badge');
+    if(!badge){badge=document.createElement('span');badge.className='n-badge';badge.style.cssText='position:absolute;top:-4px;right:-4px';b.style.position='relative';b.appendChild(badge);}
+    badge.textContent=(parseInt(badge.textContent||0)+1)||1;
+  }
+}
+
+async function sendChat(){
+  const ta=document.getElementById('chatTextarea');
+  const text=ta.value.trim();if(!text) return;
+  ta.value='';ta.style.height='auto';
+  addChat(ME.name||'Вы',text);
+  if(GAME.mode==='pvp'&&GAME.opponentId){
+    await sendGameSignal('game_chat',{text,gameId:GAME.id});
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// LOBBY
+// ═══════════════════════════════════════════════════════════
+function hideLobby(){
+  const lb=document.getElementById('lobby');
+  lb.classList.add('hidden');
+  lb.style.pointerEvents='none';
+  // Пересчитываем размер canvas когда лобби скрыто
+  setTimeout(()=>{
+    fixCanvasSize();
+    // Сбрасываем камеру на правильную позицию
+    if(camera){
+      camera.position.set(0,13,13);
+      camera.lookAt(0,0,0);
+    }
+  },30);
+}
+
+function showLobby(){
+  GAME.mode=null;GAME.over=false;GAME.id=null;
+  INVITE.toId=null;clearTimeout(INVITE.sentTimer);
+  document.getElementById('waitBanner')?.classList.remove('show');
+  document.getElementById('waitOverlay')?.classList.remove('show');
+  closePlayerSheet();
+  const lb=document.getElementById('lobby');
+  lb.classList.remove('hidden');
+  lb.style.pointerEvents='all';
+  document.getElementById('gameInfo').style.display='none';
+  clearHL();hideHint();updateOnlineList();
+  showTab('online');
+}
+
+// ═══════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════
+function showTab(name){
+  ['online','chat','hist'].forEach(n=>{
+    document.getElementById(`tab-${n}`).classList.toggle('active',n===name);
+    const p=document.getElementById(n==='online'?'onlinePanel':n==='chat'?'chatPanel':'histPanel');
+    if(p) p.classList.toggle('active',n===name);
+  });
+  if(name==='chat'){
+    const b=document.getElementById('tab-chat').querySelector('.n-badge');
+    if(b) b.remove();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════════════════════
+let statusTimer=null;
+function showStatus(text,dur=3000){
+  const el=document.getElementById('statusMsg');
+  el.textContent=text;el.classList.add('show');
+  clearTimeout(statusTimer);
+  if(dur>0) statusTimer=setTimeout(()=>el.classList.remove('show'),dur);
+}
+function showHint(text){const el=document.getElementById('gameHint');el.textContent=text;el.classList.add('show');}
+function hideHint(){document.getElementById('gameHint').classList.remove('show');}
+function escH(s){const d=document.createElement('div');d.textContent=String(s||'');return d.innerHTML;}
+function esc(s){return String(s||'').replace(/'/g,"\\'").replace(/"/g,'\\"');}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+function toggleSidebar(){
+  const sb=document.getElementById('sidebar');
+  const ov=document.getElementById('sidebarOverlay');
+  const open=sb.classList.toggle('open');
+  if(ov){if(open)ov.classList.add('active');else ov.classList.remove('active');}
+}
+function closeSidebar(){
+  const sb=document.getElementById('sidebar');
+  const ov=document.getElementById('sidebarOverlay');
+  sb.classList.remove('open');
+  if(ov) ov.classList.remove('active');
+}
+
+// Правильный resize для мобильного — canvas должен занимать всё доступное место
+function fixCanvasSize(){
+  // Авторесайз теперь в render loop — ничего делать не нужно
+  // Но обновим камеру на всякий случай
+  const cv=document.getElementById('c3d');
+  if(!cv||!renderer||!camera) return;
+  const W=cv.clientWidth,H=cv.clientHeight;
+  if(W>0&&H>0){
+    renderer.setSize(W,H,false);
+    camera.aspect=W/H;
+    camera.updateProjectionMatrix();
+  }
+}
+
+async function init(){
+  try{
+    const me=await bridge.call('getMe');
+    if(me.ok){ME.id=me.user.id;ME.name=me.user.name;ME.avatar=me.user.avatar||'';}
+
+    addChat('СИСТЕМА',`👋 Добро пожаловать, ${ME.name||'гость'}!\n♟️ Вызовите игрока онлайн или играйте с ИИ.`,true);
+
+    // Heartbeat каждые 4 секунды
+    heartbeat();
+    heartbeatTimer=setInterval(heartbeat,4000);
+
+  }catch(e){
+    addChat('СИСТЕМА','⚠️ Ошибка инициализации: '+e.message,true);
+  }
+}
+
+// ── Event listeners ──────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  const ta=document.getElementById('chatTextarea');
+  ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}});
+  ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,60)+'px';});
+});
+
+window.addEventListener('load',()=>{
+  // Лобби — сразу кликабельно
+  const lb=document.getElementById('lobby');
+  lb.style.pointerEvents='all';
+
+  // Three.js — с задержкой, не блокируем лобби
+  setTimeout(()=>{
+    try{ init3D(); }catch(e){ console.error('init3D:',e); }
+    setTimeout(fixCanvasSize,200);
+  },80);
+
+  // API
+  init();
+});
+// Правим размер при изменении viewport (мобильный — поворот экрана, клавиатура)
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',()=>setTimeout(fixCanvasSize,50));
+}
+
+window.addEventListener('beforeunload',()=>{
+  clearInterval(heartbeatTimer);
+  if(INVITE.toId) bridge.call('game_cancel',{toUserId:INVITE.toId,game:'checkers3d'});
+});
+</script>
+<!-- Player Picker Sheet -->
+<div id="playerSheet">
+  <div id="sheetBackdrop" onclick="closePlayerSheet()"></div>
+  <div id="sheetPanel">
+    <div id="sheetHandle"></div>
+    <div id="sheetHeader">
+      <span id="sheetTitle">Выбор соперника</span>
+      <button id="sheetClose" onclick="closePlayerSheet()">✕</button>
+    </div>
+    <input id="sheetSearch" type="text" placeholder="🔍  Поиск игрока…" oninput="filterSheet(this.value)" autocomplete="off" spellcheck="false">
+    <div id="sheetList"></div>
+  </div>
+</div>
+
+<!-- Wait banner -->
+<div id="waitBanner">
+  <div class="wait-spinner"></div>
+  <div class="wait-av" id="waitBannerAv">?</div>
+  <span class="wait-label" id="waitBannerText">Ожидание…</span>
+  <button onclick="cancelInviteSent()" style="padding:4px 10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:rgba(255,255,255,.6);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Отмена</button>
+</div>
+
+</body>
+</html>

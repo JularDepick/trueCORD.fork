@@ -1,0 +1,61 @@
+# trueCORD — Apache Security (safe for shared hosting)
+
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # trueCORD invite links: /inv_CODE opens the app and JS reads the code
+  RewriteRule ^inv_([A-Za-z0-9_-]+)$ index.php [L,QSA]
+  RewriteRule ^invite/([A-Za-z0-9_-]+)$ index.php [L,QSA]
+
+  # Block IP in Host header (SSRF protection)
+  RewriteCond %{HTTP_HOST} ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ [OR]
+  RewriteCond %{HTTP_HOST} ^localhost [OR]
+  RewriteCond %{HTTP_HOST} ^\[::1\]
+  RewriteRule ^ - [F,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Block database and config files
+<FilesMatch "\.(db|sqlite|sqlite3|log|bak|sql|env)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# config.php подключается только через require из API/манифеста — прямой доступ запрещён
+<Files "config.php">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+  </IfModule>
+</Files>
+
+<Files "turn_config.json">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+  </IfModule>
+</Files>
+
+# API-модули подключаются только через include из truecord_api.php — прямой доступ запрещён
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^api_modules/ - [F,L]
+</IfModule>
