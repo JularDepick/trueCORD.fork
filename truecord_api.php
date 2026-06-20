@@ -19,6 +19,27 @@ if (!function_exists('str_ends_with')) {
     }
 }
 
+// ── Оценка: хватит ли памяти PHP, чтобы загрузить картинку W×H в GD ──────────
+// imagecreatefromstring/imagecreatetruecolor держат изображение как W*H*4 байта
+// в памяти (плюс служебка). На больших фото это легко превышает memory_limit и
+// даёт фатальную ошибку (которую не поймать try/catch) → загрузка падает с
+// «Внутренней ошибкой». Здесь заранее прикидываем и, если не влезает, пропускаем
+// GD-обработку (сохраняем оригинал) вместо краха.
+function tc_gd_mem_ok(int $w, int $h): bool {
+    if ($w <= 0 || $h <= 0) return false;
+    $limitStr = @ini_get('memory_limit');
+    if ($limitStr === false || $limitStr === '' || (int)$limitStr === -1) return true; // без лимита
+    $limit = (int)$limitStr;
+    $unit  = strtolower(substr(trim($limitStr), -1));
+    if ($unit === 'g') $limit *= 1024 * 1024 * 1024;
+    elseif ($unit === 'm') $limit *= 1024 * 1024;
+    elseif ($unit === 'k') $limit *= 1024;
+    if ($limit <= 0) return true;
+    // Нужно место под исходник и под результат ресэмпла: с запасом ~6 байт на пиксель.
+    $need = ($w * $h * 6) + (int)@memory_get_usage(true) + (8 * 1024 * 1024);
+    return $need < $limit;
+}
+
 // ── Определение реального MIME по содержимому файла ──────────────────────────
 // Возвращает определённый по байтам MIME-тип или null, если определить не удалось.
 // Для изображений getimagesizefromstring надёжнее finfo; для остального — finfo_buffer.
@@ -54,6 +75,7 @@ function tc_make_thumb_bin(string $bin, string $mime): ?string {
     if (!$info) return null;
     [$w, $h] = $info;
     if ($w <= 0 || $h <= 0) return null;
+    if (!tc_gd_mem_ok((int)$w, (int)$h)) return null; // не влезет в память — без миниатюры
     if ($mime === 'image/png') {
         $t = @imagecreatefromstring($bin);
         if ($t === false) return null;
@@ -207,6 +229,15 @@ try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') sendError('POST only');
 
     $body = file_get_contents('php://input');
+    // Если тело пустое, но клиент заявил Content-Length и при этом $_POST/$_FILES
+    // тоже пусты — почти наверняка сработал лимит post_max_size PHP (частая причина
+    // «загрузка дошла до 100%, потом ошибка» при отправке крупного фото).
+    if (($body === '' || $body === false) && empty($_POST) && empty($_FILES)) {
+        $cl = (int)($_SERVER['CONTENT_LENGTH'] ?? 0);
+        if ($cl > 0) {
+            sendError('Файл слишком большой для сервера (превышен post_max_size в настройках PHP). Уменьшите файл или увеличьте post_max_size/upload_max_filesize.');
+        }
+    }
     $d    = json_decode($body, true);
     if (!$d || !isset($d['action'])) sendError('Bad request');
 
@@ -950,6 +981,9 @@ try {
         [$w, $h] = $info;
         $tooBig = (strlen($bin) > $sizeGate) || ($w > $maxDim) || ($h > $maxDim);
         if (!$tooBig) return [$bin, $mime, null]; // мелкие не трогаем
+        // Если декодирование такого размера не влезет в memory_limit — не рискуем
+        // фатальной ошибкой, отдаём оригинал как есть.
+        if (!tc_gd_mem_ok((int)$w, (int)$h)) return [$bin, $mime, null];
 
         // PNG с прозрачностью (логотипы/стикеры) не трогаем, чтобы не потерять альфу.
         if ($mime === 'image/png') {
@@ -1022,7 +1056,11 @@ try {
         // ── Проверка реального типа файла по содержимому (не доверяем MIME от клиента) ──
         // Клиент присылает заявленный $mime, но расширение и способ выдачи зависят от типа,
         // поэтому тип определяется по байтам и сверяется с заявленным. Несовпадение → отказ.
-        $sniffed = tc_sniff_mime($bin);
+        // ВАЖНО: сниффинг обёрнут в try/catch — при активном set_error_handler даже
+        // подавленный через @ warning внутри getimagesizefromstring/finfo превращается
+        // в исключение и иначе уронил бы всю загрузку «Внутренней ошибкой».
+        $sniffed = null;
+        try { $sniffed = tc_sniff_mime($bin); } catch (\Throwable $e) { $sniffed = null; }
         if ($sniffed !== null) {
             // Группа (image/video/audio/...) должна совпадать; для изображений проверяем и подтип.
             $declaredGroup = explode('/', $mime)[0];
@@ -1040,9 +1078,15 @@ try {
         }
 
         // Сжатие/ресайз крупных изображений (jpeg/png/webp без прозрачности). GIF и прозрачные PNG не трогаются.
+        // Любая ошибка GD здесь НЕ должна валить загрузку — просто сохраняем оригинал.
         $forcedExt = null;
         if (str_starts_with($mime, 'image/')) {
-            [$bin, $mime, $forcedExt] = compressImageIfNeeded($bin, $mime);
+            try {
+                [$bin, $mime, $forcedExt] = compressImageIfNeeded($bin, $mime);
+            } catch (\Throwable $e) {
+                error_log('[trueCORD] compress skipped: ' . $e->getMessage());
+                $forcedExt = null; // оставляем оригинальные $bin/$mime
+            }
         }
         $map = [
             'image/jpeg'=>'jpg','image/png'=>'png','image/gif'=>'gif','image/webp'=>'webp',
@@ -1081,11 +1125,16 @@ try {
         }
         if (file_put_contents($dir . $fname, $bin) === false) apiFail('Ошибка записи файла');
         // Сразу создаём миниатюру для ленты (молча; если не вышло — фронт отдаст оригинал).
+        // Обёрнуто в try/catch: ошибка миниатюры не должна срывать уже успешную загрузку.
         if (str_starts_with($mime, 'image/')) {
-            $thumb = makeThumbnail($bin, $mime);
-            if ($thumb !== null) {
-                $thumbName = preg_replace('/\.[^.]+$/', '', $fname) . '.thumb.jpg';
-                @file_put_contents($dir . $thumbName, $thumb);
+            try {
+                $thumb = makeThumbnail($bin, $mime);
+                if ($thumb !== null) {
+                    $thumbName = preg_replace('/\.[^.]+$/', '', $fname) . '.thumb.jpg';
+                    @file_put_contents($dir . $thumbName, $thumb);
+                }
+            } catch (\Throwable $e) {
+                error_log('[trueCORD] thumb skipped: ' . $e->getMessage());
             }
         }
         $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
