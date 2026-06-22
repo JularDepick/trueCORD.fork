@@ -8570,28 +8570,28 @@ textarea.fi { line-height:1.55 !important; }
 <div id="streamViewer">
   <div class="sv-header" id="svHeader">
     <div class="sv-live-dot"></div>
-    <span class="sv-title" id="svTitle">Трансляция</span>
-    <button class="sv-mini-leave" onclick="closeStreamViewer();event.stopPropagation()" data-i18n-title="common.exit" title="Выйти"><span class="ti"><svg viewBox="0 0 24 24" width="15" height="15"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><polyline points="16 17 21 12 16 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span> Выйти</button>
+    <span class="sv-title" id="svTitle" data-i18n="stream.live">Трансляция</span>
+    <button class="sv-mini-leave" onclick="closeStreamViewer();event.stopPropagation()" data-i18n-title="common.exit" title="Выйти"><span class="ti"><svg viewBox="0 0 24 24" width="15" height="15"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><polyline points="16 17 21 12 16 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span> <span data-i18n="stream.leave">Выйти</span></button>
     <button class="sv-btn sv-min-btn" id="svMinBtn" onclick="svToggleMin();event.stopPropagation()" data-i18n-title="common.minimize" title="Свернуть">─</button>
-    <button class="sv-btn" id="svFullscreenBtn" onclick="svToggleFullscreen();event.stopPropagation()" title="На весь экран" aria-label="На весь экран"><span class="ti"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
-    <button class="sv-btn" onclick="hideStreamViewerWindow();event.stopPropagation()" title="Закрыть окно, не останавливая просмотр"><span class="ti"><svg viewBox="0 0 24 24" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></button>
+    <button class="sv-btn" id="svFullscreenBtn" onclick="svToggleFullscreen();event.stopPropagation()" data-i18n-title="stream.fullscreen" title="На весь экран" aria-label="На весь экран"><span class="ti"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+    <button class="sv-btn" onclick="hideStreamViewerWindow();event.stopPropagation()" data-i18n-title="stream.closeKeepWatching" title="Закрыть окно, не останавливая просмотр"><span class="ti"><svg viewBox="0 0 24 24" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></button>
   </div>
   <div class="sv-video-wrap" id="svVideoWrap">
     <div class="sv-no-stream" id="svNoStream">
       <span style="font-size:32px">🖥</span>
-      <span>Трансляция недоступна</span>
+      <span data-i18n="stream.unavailable">Трансляция недоступна</span>
     </div>
-    <div class="sv-audio-controls" id="svAudioControls" aria-label="Громкость трансляции">
-      <button class="sv-audio-btn" id="svMuteBtn" onclick="svToggleMute();event.stopPropagation()" title="Отключить звук трансляции" aria-label="Отключить звук трансляции"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></button>
-      <input class="sv-audio-slider" id="svVolSlider" type="range" min="0" max="100" value="100" oninput="svSetVolume(this.value);event.stopPropagation()" onclick="event.stopPropagation()" title="Громкость трансляции" aria-label="Громкость трансляции">
+    <div class="sv-audio-controls" id="svAudioControls" data-i18n-aria="stream.volume" aria-label="Громкость трансляции">
+      <button class="sv-audio-btn" id="svMuteBtn" onclick="svToggleMute();event.stopPropagation()" data-i18n-title="stream.mute" title="Отключить звук трансляции" aria-label="Отключить звук трансляции"><svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></button>
+      <input class="sv-audio-slider" id="svVolSlider" type="range" min="0" max="100" value="100" oninput="svSetVolume(this.value);event.stopPropagation()" onclick="event.stopPropagation()" data-i18n-title="stream.volume" title="Громкость трансляции" aria-label="Громкость трансляции">
       <span class="sv-audio-label" id="svVolLabel">100%</span>
     </div>
-    <div class="sv-reactions" id="svReactions" aria-label="Реакции на трансляцию">
-      <button class="sv-reaction-btn" onclick="svSendReaction('🔥');event.stopPropagation()" title="Огонь">🔥</button>
-      <button class="sv-reaction-btn" onclick="svSendReaction('😂');event.stopPropagation()" title="Смешно">😂</button>
-      <button class="sv-reaction-btn" onclick="svSendReaction('👏');event.stopPropagation()" title="Аплодисменты">👏</button>
-      <button class="sv-reaction-btn" onclick="svSendReaction('❤️');event.stopPropagation()" title="Нравится">❤️</button>
-      <button class="sv-reaction-btn" onclick="svSendReaction('😮');event.stopPropagation()" title="Вау">😮</button>
+    <div class="sv-reactions" id="svReactions" data-i18n-aria="stream.reactions" aria-label="Реакции на трансляцию">
+      <button class="sv-reaction-btn" onclick="svSendReaction('🔥');event.stopPropagation()" data-i18n-title="stream.react.fire" title="Огонь">🔥</button>
+      <button class="sv-reaction-btn" onclick="svSendReaction('😂');event.stopPropagation()" data-i18n-title="stream.react.funny" title="Смешно">😂</button>
+      <button class="sv-reaction-btn" onclick="svSendReaction('👏');event.stopPropagation()" data-i18n-title="stream.react.applause" title="Аплодисменты">👏</button>
+      <button class="sv-reaction-btn" onclick="svSendReaction('❤️');event.stopPropagation()" data-i18n-title="stream.react.like" title="Нравится">❤️</button>
+      <button class="sv-reaction-btn" onclick="svSendReaction('😮');event.stopPropagation()" data-i18n-title="stream.react.wow" title="Вау">😮</button>
     </div>
   </div>
 </div>
@@ -8609,8 +8609,8 @@ textarea.fi { line-height:1.55 !important; }
     <div class="srv-icon-inner" id="dmSrvIconInner" data-ti="msg" style="display:flex;align-items:center;justify-content:center;font-size:22px"></div>
     <div class="srv-notif-dot" id="dmBadgeDot"></div>
   </div>
-  <div id="superAdminSrvBtn" style="display:none" title="Панель суперадмина" onclick="showAdminPanel()"></div>
-  <div id="srvAdminBtn" style="display:none" title="Управление сервером"></div>
+  <div id="superAdminSrvBtn" style="display:none" data-i18n-title="superAdmin.panel" title="Панель суперадмина" onclick="showAdminPanel()"></div>
+  <div id="srvAdminBtn" style="display:none" data-i18n-title="server.manage" title="Управление сервером"></div>
   <div class="srv-sep"></div>
   <div id="srvIcons"></div>
 </div>
@@ -8670,7 +8670,7 @@ textarea.fi { line-height:1.55 !important; }
     </div>
     <div class="up-info">
       <div class="up-name" id="upName">—</div>
-      <div class="up-tag" id="upStatusLabel" onclick="toggleStatusPicker(event)">В сети</div>
+      <div class="up-tag" id="upStatusLabel" onclick="toggleStatusPicker(event)" data-i18n="status.online">В сети</div>
     </div>
     <div class="up-btns">
       <button class="up-notif-btn" id="notifBellBtn" onclick="toggleNotifPanel(event)" title="Уведомления" data-i18n-title="common.notifications">
@@ -8690,23 +8690,23 @@ textarea.fi { line-height:1.55 !important; }
     <div id="hdrName" class="hdr-ch-name">—</div>
     <div id="hdrTopic" class="hdr-topic"></div>
     <div class="hdr-actions">
-      <button class="icon-btn" id="hdrCallBtn" onclick="startDmCall()" title="Звонок" data-ti="phone" style="display:none"></button>
-      <button class="icon-btn" id="hdrVideoCallBtn" onclick="startDmVideoCall()" title="Видеозвонок" data-ti="video" style="display:none"></button>
-      <button class="icon-btn" id="hdrDmVideoReturnBtn" onclick="showDmVideoWindow()" title="Открыть окно видеозвонка" data-ti="expand" style="display:none"></button>
-      <button class="icon-btn" id="hdrDmPrivacyBtn" onclick="showDmPrivacyForCurrent()" title="Приватность ЛС и звонков" data-ti="gear" style="display:none"></button>
-      <button class="icon-btn" id="hdrDmClearBtn" onclick="showDmClearModal()" title="Очистить ЛС до даты" data-ti="trash" style="display:none"></button>
-      <button class="icon-btn" id="hdrCopyLink" onclick="copyChannelLink()" title="Ссылка" data-ti="link" style="display:none"></button>
+      <button class="icon-btn" id="hdrCallBtn" onclick="startDmCall()" data-i18n-title="dm.call" title="Звонок" data-ti="phone" style="display:none"></button>
+      <button class="icon-btn" id="hdrVideoCallBtn" onclick="startDmVideoCall()" data-i18n-title="dm.videoCall" title="Видеозвонок" data-ti="video" style="display:none"></button>
+      <button class="icon-btn" id="hdrDmVideoReturnBtn" onclick="showDmVideoWindow()" data-i18n-title="dm.openVideoWindow" title="Открыть окно видеозвонка" data-ti="expand" style="display:none"></button>
+      <button class="icon-btn" id="hdrDmPrivacyBtn" onclick="showDmPrivacyForCurrent()" data-i18n-title="dm.privacy" title="Приватность ЛС и звонков" data-ti="gear" style="display:none"></button>
+      <button class="icon-btn" id="hdrDmClearBtn" onclick="showDmClearModal()" data-i18n-title="dm.clearUntil" title="Очистить ЛС до даты" data-ti="trash" style="display:none"></button>
+      <button class="icon-btn" id="hdrCopyLink" onclick="copyChannelLink()" data-i18n-title="common.link" title="Ссылка" data-ti="link" style="display:none"></button>
       <button class="icon-btn" id="memberToggleBtn" onclick="toggleMemberSidebar()" title="Участники" data-i18n-title="common.members"><span id="memberCountBadge"></span></button>
 
     </div>
   </div>
   <div id="dmCallBar">
     <span class="ti"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.06 6.06l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/></svg></span>
-    <span class="dcb-name" id="dcbName">Звонок</span>
+    <span class="dcb-name" id="dcbName" data-i18n="dm.call">Звонок</span>
     <span class="dcb-timer" id="dcbTimer">00:00</span>
-    <button class="dcb-btn dcb-btn-mute" id="dcbMuteBtn" onclick="dmCallToggleMute()" style="display:inline-flex;align-items:center;gap:5px"><span class="ti"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span> Вкл</button>
-    <button class="dcb-btn dcb-btn-video" id="dcbVideoBtn" onclick="showDmVideoWindow()" title="Открыть видео" style="display:none;align-items:center;gap:5px"><span class="ti"><svg viewBox="0 0 24 24" width="16" height="16"><rect x="2" y="4" width="15" height="16" rx="2" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M17 9l5-3v12l-5-3" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/></svg></span> Видео</button>
-    <button class="dcb-btn dcb-btn-end" onclick="dmCallHangup()" style="display:inline-flex;align-items:center;gap:5px"><span class="ti"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.44-2.85M5.28 10.2A19.44 19.44 0 0 1 3.03 6a2 2 0 0 1 1.97-2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.91 11.9" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="23" y1="1" x2="1" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span> Завершить</button>
+    <button class="dcb-btn dcb-btn-mute" id="dcbMuteBtn" onclick="dmCallToggleMute()" style="display:inline-flex;align-items:center;gap:5px"><span class="ti"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span> <span data-i18n="dm.muteOn">Вкл</span></button>
+    <button class="dcb-btn dcb-btn-video" id="dcbVideoBtn" onclick="showDmVideoWindow()" data-i18n-title="dm.openVideo" title="Открыть видео" style="display:none;align-items:center;gap:5px"><span class="ti"><svg viewBox="0 0 24 24" width="16" height="16"><rect x="2" y="4" width="15" height="16" rx="2" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M17 9l5-3v12l-5-3" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/></svg></span> <span data-i18n="dm.video">Видео</span></button>
+    <button class="dcb-btn dcb-btn-end" onclick="dmCallHangup()" style="display:inline-flex;align-items:center;gap:5px"><span class="ti"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.44-2.85M5.28 10.2A19.44 19.44 0 0 1 3.03 6a2 2 0 0 1 1.97-2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.91 11.9" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="23" y1="1" x2="1" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span> <span data-i18n="dm.endCall">Завершить</span></button>
   </div>
   <div id="welcomeScreen">
     <div class="ws-icon"><span class="ti" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="24" height="24"><line x1="5" y1="19" x2="19" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><polyline points="15 5 19 5 19 9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="5" y1="15" x2="8" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></div>
@@ -8715,9 +8715,9 @@ textarea.fi { line-height:1.55 !important; }
   </div>
   <div id="joinServerScreen">
     <div class="join-srv-icon" id="joinSrvIcon"><span class="ti" style="display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M3 21V9l3-3h3V3h2v3h2V3h2v3h3l3 3v12H3z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><rect x="9" y="15" width="6" height="6" stroke="currentColor" stroke-width="1.6" fill="none"/></svg></span></div>
-    <div class="join-srv-name" id="joinSrvName">Сервер</div>
-    <div class="join-srv-desc" id="joinSrvDesc">Вы ещё не вступили на этот сервер</div>
-    <button class="btn btn-gold" onclick="doJoinCurrentServer()" id="joinSrvBtn" style="display:inline-flex;align-items:center;gap:7px;justify-content:center"><span class="ti"><svg viewBox="0 0 24 24" width="14" height="14"><line x1="5" y1="19" x2="19" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><polyline points="15 5 19 5 19 9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="5" y1="15" x2="8" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span> Вступить на сервер</button>
+    <div class="join-srv-name" id="joinSrvName" data-i18n="join.server">Сервер</div>
+    <div class="join-srv-desc" id="joinSrvDesc" data-i18n="join.notMemberYet">Вы ещё не вступили на этот сервер</div>
+    <button class="btn btn-gold" onclick="doJoinCurrentServer()" id="joinSrvBtn" style="display:inline-flex;align-items:center;gap:7px;justify-content:center"><span class="ti"><svg viewBox="0 0 24 24" width="14" height="14"><line x1="5" y1="19" x2="19" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><polyline points="15 5 19 5 19 9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="5" y1="15" x2="8" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span> <span data-i18n="join.joinServer">Вступить на сервер</span></button>
   </div>
   <div id="chView" style="display:none;flex:1;flex-direction:column;overflow:hidden;min-height:0">
     <div id="chBanner"></div>
@@ -8727,15 +8727,15 @@ textarea.fi { line-height:1.55 !important; }
       <div class="upload-progress-wrap" id="uploadProgressWrap"><div class="upload-progress-bar" id="uploadProgressBar"></div></div>
       <div id="pendingFilesWrap" class="pending-files-wrap"></div>
       <div id="replyBar">
-        <span>↩ Ответ <strong id="replyToName"></strong>: <em id="replyPreview" style="color:var(--text3)"></em></span>
+        <span>↩ <span data-i18n="reply.reply">Ответ</span> <strong id="replyToName"></strong>: <em id="replyPreview" style="color:var(--text3)"></em></span>
         <span class="rply-cancel" onclick="cancelReply()" style="display:flex;align-items:center"><span class="ti"><svg viewBox="0 0 24 24" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></span>
       </div>
       <div class="input-box">
-        <button class="inp-btn" onclick="triggerUpload('msgFile')" title="Прикрепить"><span class="ti" data-ti="attach"></span></button>
+        <button class="inp-btn" onclick="triggerUpload('msgFile')" data-i18n-title="common.attach" title="Прикрепить"><span class="ti" data-ti="attach"></span></button>
         <input type="file" id="msgFile" accept="image/*,video/*,audio/*,.zip,.rar,.7z,.tar,.gz,.bz2,.mp3,.ogg,.wav,.flac,.txt,.md,.json,.log,.csv" multiple style="display:none" onchange="handleMultiUpload(this,'channel')">
         <textarea id="msgInput" class="msg-textarea" rows="1" placeholder="Написать сообщение…" data-i18n-ph="nav.writeMessage" onkeydown="onMsgKey(event)" oninput="onMsgInput(this)"></textarea>
-        <button class="inp-btn" onclick="openEmojiForInput()" title="Эмодзи">😊</button>
-        <button class="inp-btn" onclick="sendMsg()" title="Отправить" style="color:var(--gold)">➤</button>
+        <button class="inp-btn" onclick="openEmojiForInput()" data-i18n-title="common.emoji" title="Эмодзи">😊</button>
+        <button class="inp-btn" onclick="sendMsg()" data-i18n-title="common.send" title="Отправить" style="color:var(--gold)">➤</button>
       </div>
     </div>
   </div>
@@ -8807,7 +8807,7 @@ textarea.fi { line-height:1.55 !important; }
   </div>
 </div>
 <div id="memberSidebar" class="collapsed">
-  <div class="mb-header">Участники</div>
+  <div class="mb-header" data-i18n="member.header">Участники</div>
   <div class="mb-scroll" id="memberList"></div>
 </div>
 </div>
@@ -8817,7 +8817,7 @@ textarea.fi { line-height:1.55 !important; }
   <div class="ep-tabs" id="epTabs"></div>
   <div class="ep-grid" id="epGrid"></div>
   <div class="ep-custom">
-    <input class="ep-custom-inp" id="epCustom" placeholder="✍ Свой эмодзи" maxlength="8" onkeydown="if(event.key==='Enter'){applyCustomEmoji();event.preventDefault()}">
+    <input class="ep-custom-inp" id="epCustom" data-i18n-ph="emoji.customPlaceholder" placeholder="✍ Свой эмодзи" maxlength="8" onkeydown="if(event.key==='Enter'){applyCustomEmoji();event.preventDefault()}">
     <button class="ep-custom-btn" onclick="applyCustomEmoji()">OK</button>
   </div>
 </div>
@@ -8828,15 +8828,15 @@ textarea.fi { line-height:1.55 !important; }
 <!-- CONTEXT MENU -->
 <div id="ctxMenu">
   <div class="ctx-em-row" id="ctxEmRow"></div>
-  <div class="ctx-item" id="ctxReply" onclick="ctxReply()" style="display:flex;align-items:center;gap:7px"><svg viewBox="0 0 24 24" width="13" height="13"><polyline points="9 17 4 12 9 7" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M20 18v-2a4 4 0 0 0-4-4H4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>Ответить</div>
-  <div class="ctx-item" id="ctxComment" onclick="ctxComment()" style="display:flex;align-items:center;gap:7px"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M20 2H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h3l2.5 3 2.5-3h8a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>Комментировать</div>
-  <div class="ctx-item" id="ctxEdit" onclick="ctxEdit()" style="display:flex;align-items:center;gap:7px"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>Редактировать</div>
-  <div class="ctx-item" id="ctxMention" onclick="ctxMention()" style="display:flex;align-items:center;gap:7px"><svg viewBox="0 0 24 24" width="13" height="13"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>Упомянуть</div>
-  <div class="ctx-item" id="ctxForward" onclick="ctxForward()" style="display:none;align-items:center;gap:7px"><svg viewBox="0 0 24 24" width="13" height="13"><polyline points="15 17 20 12 15 7" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M4 18v-2a4 4 0 0 1 4-4h12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>Переслать</div>
-  <div class="ctx-item" id="ctxCopy" onclick="ctxCopy()" style="display:flex;align-items:center;gap:7px"><svg viewBox="0 0 24 24" width="13" height="13"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>Копировать текст</div>
-  <div class="ctx-item" id="ctxCopyLink" onclick="ctxCopyMsgLink()" style="display:none;align-items:center;gap:7px"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>Ссылка</div>
+  <div class="ctx-item" id="ctxReply" onclick="ctxReply()" style="display:flex;align-items:center;gap:7px"><svg viewBox="0 0 24 24" width="13" height="13"><polyline points="9 17 4 12 9 7" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M20 18v-2a4 4 0 0 0-4-4H4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><span data-i18n="ctx.reply">Ответить</span></div>
+  <div class="ctx-item" id="ctxComment" onclick="ctxComment()" style="display:flex;align-items:center;gap:7px"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M20 2H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h3l2.5 3 2.5-3h8a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="1.8" fill="none"/></svg><span data-i18n="ctx.comment">Комментировать</span></div>
+  <div class="ctx-item" id="ctxEdit" onclick="ctxEdit()" style="display:flex;align-items:center;gap:7px"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z" stroke="currentColor" stroke-width="1.8" fill="none"/></svg><span data-i18n="ctx.edit">Редактировать</span></div>
+  <div class="ctx-item" id="ctxMention" onclick="ctxMention()" style="display:flex;align-items:center;gap:7px"><svg viewBox="0 0 24 24" width="13" height="13"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><span data-i18n="ctx.mention">Упомянуть</span></div>
+  <div class="ctx-item" id="ctxForward" onclick="ctxForward()" style="display:none;align-items:center;gap:7px"><svg viewBox="0 0 24 24" width="13" height="13"><polyline points="15 17 20 12 15 7" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M4 18v-2a4 4 0 0 1 4-4h12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><span data-i18n="ctx.forward">Переслать</span></div>
+  <div class="ctx-item" id="ctxCopy" onclick="ctxCopy()" style="display:flex;align-items:center;gap:7px"><svg viewBox="0 0 24 24" width="13" height="13"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><span data-i18n="ctx.copyText">Копировать текст</span></div>
+  <div class="ctx-item" id="ctxCopyLink" onclick="ctxCopyMsgLink()" style="display:none;align-items:center;gap:7px"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><span data-i18n="ctx.link">Ссылка</span></div>
   <div class="ctx-sep"></div>
-  <div class="ctx-item danger" id="ctxDel" onclick="ctxDelete()" style="display:none;align-items:center;gap:7px"><svg viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>Удалить</div>
+  <div class="ctx-item danger" id="ctxDel" onclick="ctxDelete()" style="display:none;align-items:center;gap:7px"><svg viewBox="0 0 24 24" width="13" height="13"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><span data-i18n="ctx.delete">Удалить</span></div>
 </div>
 
 <!-- DYNAMIC ISLAND -->
@@ -9901,7 +9901,7 @@ function findUserByMentionName(name){
 window.openMentionProfileByName=function(name){
   const u=findUserByMentionName(name);
   if(u&&u.id){showUserProfile(u.id);return;}
-  toast('Пользователь не найден в текущем списке','err');
+  toast(t('dm.user')+' '+t('common.search'),'err');
 };
 document.addEventListener('click',e=>{
   const mention=e.target.closest?.('.msg-text .mention[data-mention]');
@@ -11525,7 +11525,7 @@ window.addEventListener('beforeunload',()=>{
 });
 // ── Автопереподключение голоса при смене/восстановлении сети ──
 window.addEventListener('online',()=>{
-  toast('Сеть восстановлена','ok',2500);
+  toast(t('toast.networkRestored'),'ok',2500);
   if(VOICE.roomId!==null) setTimeout(()=>voiceReconnect().catch(()=>{}),1500);
 });
 window.addEventListener('offline',()=>{
@@ -12162,7 +12162,7 @@ function canCreateChannelCurrentServer(){
 }
 function assertCanCreateChannel(){
   if(canCreateChannelCurrentServer()) return true;
-  toast('Нет прав для создания каналов','err');
+  toast(t('toast.noChannelPermission'),'err');
   return false;
 }
 function assertCanManageChannel(ch){
@@ -13804,8 +13804,8 @@ async function voicePoll(){
 function showCreateVoiceRoomModal(){showModal(`<h2>${ti('speaker',18)} ${t('voice.newRoom')}</h2><div class="fg"><label class="fl">${t('settings.srvName')}</label><input class="fi" id="vrName" placeholder="${t('voice.roomPlaceholder')}" maxlength="32"></div><button class="btn btn-gold btn-full" onclick="createVoiceRoom()">${t('common.create')}</button>`);setTimeout(()=>q('vrName')?.focus(),100);}
 window.createVoiceRoom=async function(){const name=q('vrName')?.value.trim();if(!name){toast(t('toast.enterName'),'err');return;}const r=await api({action:'voice_create_room',serverId:S.srvId,name});if(!r.ok){toast(r.error,'err');return;}closeModal();toast(t('voice.roomCreated'),'ok');await loadVoiceRooms(S.srvId);};
 window.showVoiceRoomSettings=function(roomId,roomName){showModal(`<h2>${ti('gear',18)} ${t('voice.roomSettings')}</h2><div class="fg"><label class="fl">${t('settings.srvName')}</label><input class="fi" id="vrEditName" value="${esc(roomName)}" maxlength="32"></div><div class="btn-row"><button class="btn btn-gold" onclick="updateVoiceRoom(${roomId})">${t('common.save')}</button><button class="btn btn-red" onclick="deleteVoiceRoom(${roomId})">${t('common.delete')}</button></div>`);};
-window.updateVoiceRoom=async function(roomId){const name=q('vrEditName')?.value.trim();if(!name) return;const r=await api({action:'voice_update_room',roomId,name});if(!r.ok){toast(r.error,'err');return;}closeModal();toast('Сохранено','ok');await loadVoiceRooms(S.srvId);};
-window.deleteVoiceRoom=async function(roomId){if(!confirm('Удалить?')) return;if(VOICE.roomId===roomId) await voiceLeave(true);const r=await api({action:'voice_delete_room',roomId});if(!r.ok){toast(r.error,'err');return;}closeModal();toast(t('toast.deleted'),'ok');await loadVoiceRooms(S.srvId);};
+window.updateVoiceRoom=async function(roomId){const name=q('vrEditName')?.value.trim();if(!name) return;const r=await api({action:'voice_update_room',roomId,name});if(!r.ok){toast(r.error,'err');return;}closeModal();toast(t('toast.saved'),'ok');await loadVoiceRooms(S.srvId);};
+window.deleteVoiceRoom=async function(roomId){if(!confirm(t('common.delete')+'?')) return;if(VOICE.roomId===roomId) await voiceLeave(true);const r=await api({action:'voice_delete_room',roomId});if(!r.ok){toast(r.error,'err');return;}closeModal();toast(t('toast.deleted'),'ok');await loadVoiceRooms(S.srvId);};
 
 // ── DM CALL ──────────────────────────────────────────────────
 function showDmCallOverlay(fromId,fromName,fromAvatar,isIncoming){
@@ -13843,7 +13843,7 @@ function hideDmCallBar(){
 }
 window.startDmCall=async function(video=false){
   if(!S.dmUid) return;
-  if(DMCALL.active){toast('Уже идёт звонок','err');return;}
+  if(DMCALL.active){toast(t('toast.callInProgress'),'err');return;}
   // ★ FIX: автоматически покидаем голосовой чат при начале звонка в ЛС
   if(VOICE.roomId!==null) await voiceLeave(true);
   const u=S.allUsers.find(x=>x.id===S.dmUid)||{name:'Пользователь',avatar:''};DMCALL.withUserId=S.dmUid;
@@ -13862,7 +13862,7 @@ window.dmCallAccept=async function(){
   showDmCallBar(DMCALL.withUserName);
   playSound('call_accepted');
 };
-window.dmCallReject=async function(){if(!DMCALL.withUserId) return;stopRingtone();const toId=DMCALL.withUserId;hideDmCallOverlay();await api({action:'dm_call_reject',toUserId:toId});dmCallReset();toast('Звонок отклонён','info');};
+window.dmCallReject=async function(){if(!DMCALL.withUserId) return;stopRingtone();const toId=DMCALL.withUserId;hideDmCallOverlay();await api({action:'dm_call_reject',toUserId:toId});dmCallReset();toast(t('toast.callRejected'),'info');};
 window.dmCallHangup=async function(silent=false){const toId=DMCALL.withUserId;releaseWakeLock();
 stopRingtone();hideDmCallOverlay();hideDmCallBar();if(toId) await api({action:'dm_call_hangup',toUserId:toId});dmCallCleanupPeer();dmCallReset();if(!silent) playSound('call_ended');};
 window.dmCallToggleMute=function(){DMCALL.muted=!DMCALL.muted;if(DMCALL.stream) DMCALL.stream.getAudioTracks().forEach(t=>t.enabled=!DMCALL.muted);const btn=q('dcbMuteBtn');btn.innerHTML=DMCALL.muted?`<svg viewBox="0 0 24 24" width="16" height="16"><line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Выкл`:(`<svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Вкл`);btn.classList.toggle('muted',DMCALL.muted);syncDmCallSurface();dmvcRevealControls();};
@@ -13886,7 +13886,7 @@ async function getDmCallMediaStream(withVideo=false){
       cam.getVideoTracks().forEach(t=>out.addTrack(t));
       out._cameraStream=cam;
     }catch(e){
-      toast('Камера недоступна, звонок начат голосом','info',3500);
+      toast(t('toast.cameraUnavailableVoice'),'info',3500);
       DMCALL.wantVideo=false;DMCALL.videoEnabled=false;
     }
   }
@@ -13895,7 +13895,7 @@ async function getDmCallMediaStream(withVideo=false){
 async function dmCallSetupStream(){
   if(DMCALL.stream) return;
   try{DMCALL.stream=await getDmCallMediaStream(!!DMCALL.wantVideo);DMCALL.videoEnabled=!!DMCALL.stream.getVideoTracks().length;dmCallSetupVadSource('local',DMCALL.stream,true);dmCallStartVADLoop();syncDmCallSurface();}
-  catch(e){toast('Нет доступа к микрофону','err');await dmCallHangup(true);}
+  catch(e){toast(t('toast.noMicAccess'),'err');await dmCallHangup(true);}
 }
 
 function updateDmVideoRestoreButton(){
@@ -14111,7 +14111,7 @@ function ensureDmVideoWindow(){
   return el;
 }
 function showDmCallWindow(){
-  if(!DMCALL.active){toast('Нет активного звонка','info');return null;}
+  if(!DMCALL.active){toast(t('toast.noActiveCall'),'info');return null;}
   const el=ensureDmVideoWindow();
   exitFullscreenForWindowOpen();
   el.classList.add('show','dmvc-controls-visible');
@@ -14169,7 +14169,7 @@ window.dmCallToggleVideo=async function(){
     const lv=q('dmvcLocalVideo');if(lv) lv.srcObject=null;syncDmCallSurface();updateDmVideoRestoreButton();dmvcRevealControls();return;
   }
   try{const cam=await navigator.mediaDevices.getUserMedia({video:dmVideoConstraints(),audio:false});const vt=cam.getVideoTracks()[0];DMCALL.stream.addTrack(vt);DMCALL.videoEnabled=true;DMCALL.screenSharing=false;await setDmOutgoingVideoTrack(vt);showDmVideoWindow();}
-  catch(e){toast('Камера недоступна','err');}
+  catch(e){toast(t('toast.cameraUnavailable'),'err');}
 };
 window.dmCallShareScreen=async function(){
   if(!DMCALL.active) return;
@@ -14263,8 +14263,8 @@ async function dmCallHandleSignal(sig){
   if(type==='call_answered'){
     hideDmCallOverlay();await dmCallSetupStream();await dmCallInitiatePeer();showDmCallBar(DMCALL.withUserName);playSound('call_accepted');return;
   }
-  if(type==='call_rejected'){stopRingtone();hideDmCallOverlay();dmCallCleanupPeer();dmCallReset();toast('Звонок отклонён','info');playSound('call_ended');return;}
-  if(type==='call_hangup'){stopRingtone();hideDmCallOverlay();hideDmCallBar();dmCallCleanupPeer();dmCallReset();toast('Звонок завершён','info');playSound('call_ended');return;}
+  if(type==='call_rejected'){stopRingtone();hideDmCallOverlay();dmCallCleanupPeer();dmCallReset();toast(t('toast.callRejected'),'info');playSound('call_ended');return;}
+  if(type==='call_hangup'){stopRingtone();hideDmCallOverlay();hideDmCallBar();dmCallCleanupPeer();dmCallReset();toast(t('toast.callEnded'),'info');playSound('call_ended');return;}
 
   // ★ АУДИО FIX: исправление race condition — offer может прийти до создания PC
   if(type==='offer'&&!DMCALL.pc&&DMCALL.active&&!DMCALL.isInitiator){
@@ -14386,11 +14386,11 @@ async function deleteDmConv(uid,name){
   if(!r.ok){toast(r.error,'err');return;}
   S.dmConvs=S.dmConvs.filter(c=>c.userId!==uid);
   if(S.dmUid===uid){S.dmUid=null;q('dmView').style.display='none';q('welcomeScreen').style.display='flex';}
-  renderDmList();toast('Чат удалён','ok');
+  renderDmList();toast(t('dm.chatDeleted'),'ok');
 }
 
 function showDmClearModal(){
-  if(!S.dmUid){toast('Сначала откройте личный чат','err');return;}
+  if(!S.dmUid){toast(t('dm.openChatFirst'),'err');return;}
   const user=S.allUsers.find(u=>u.id===S.dmUid);
   const name=user?.name||q('hdrName')?.textContent||'пользователем';
   const today=new Date().toISOString().slice(0,10);
@@ -14415,10 +14415,10 @@ async function clearDmBeforeSelectedDate(){
   if(!S.dmUid) return;
   const inp=q('dmClearBeforeDate');
   const date=inp?.value||'';
-  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)){toast('Выберите дату','err');return;}
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)){toast(t('dm.selectDate'),'err');return;}
   const cutoff=new Date(date+'T23:59:59.999');
   const cutoffMs=cutoff.getTime();
-  if(!Number.isFinite(cutoffMs)){toast('Неверная дата','err');return;}
+  if(!Number.isFinite(cutoffMs)){toast(t('dm.invalidDate'),'err');return;}
   const user=S.allUsers.find(u=>u.id===S.dmUid);
   const name=user?.name||q('hdrName')?.textContent||'пользователем';
   if(!confirm(`Удалить для обоих участников все сообщения с ${name} до ${date} включительно?`)) return;
@@ -15189,7 +15189,7 @@ function startEditMsg(m){
   const ta=document.getElementById('editTA_'+m.id);
   if(ta){ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);ta.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();saveEditMsg(m.id);}if(e.key==='Escape'){cancelEditMsg(m.id);}};ta.oninput=()=>{ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';};}
 }
-async function saveEditMsg(msgId){const ta=document.getElementById('editTA_'+msgId);if(!ta) return;const newText=ta.value.trim();if(!newText){toast('Текст не может быть пустым','err');return;}const mode=ta.getAttribute('data-edit-mode')||'channel';const action=mode==='dm'?'dm_edit':'edit_message';const r=await api({action,messageId:msgId,text:newText});if(!r.ok){toast(r.error,'err');return;}cancelEditMsg(msgId,r.text,r.textHtml);toast('Сообщение изменено ✓','ok');}
+async function saveEditMsg(msgId){const ta=document.getElementById('editTA_'+msgId);if(!ta) return;const newText=ta.value.trim();if(!newText){toast(t('msg.textEmpty'),'err');return;}const mode=ta.getAttribute('data-edit-mode')||'channel';const action=mode==='dm'?'dm_edit':'edit_message';const r=await api({action,messageId:msgId,text:newText});if(!r.ok){toast(r.error,'err');return;}cancelEditMsg(msgId,r.text,r.textHtml);toast(t('msg.editedOk'),'ok');}
 function cancelEditMsg(msgId,newText,newHtml){const row=document.querySelector(`[data-msg-id="${msgId}"]`);if(!row) return;const msgBody=row.querySelector('.msg-body');if(!msgBody) return;const box=msgBody.querySelector('.msg-edit-box');if(box) box.remove();let textEl=msgBody.querySelector('.msg-text');if(newText&&textEl){textEl.style.display='';textEl.innerHTML=applyMarkdown(newText)+'<span class="msg-edited-tag"> (ред.)</span>';}else if(textEl){textEl.style.display='';}}
 
 // ── POLL ─────────────────────────────────────────────────────
@@ -15491,7 +15491,7 @@ window.ctxComment=function(){if(!_ctxMsg) return;closeCtx();const row=document.q
 window.ctxEdit=function(){if(_ctxMsg) startEditMsg(_ctxMsg);};
 window.ctxMention=function(){if(!_ctxMsg) return;const ta=S.mode==='dm'?q('dmInput'):q('msgInput');if(ta){ta.value+='@'+_ctxMsg.name+' ';ta.focus();autoGrow(ta);}closeCtx();};
 window.ctxForward=function(){if(!_ctxMsg) return;closeCtx();showForwardModal(_ctxMsg.id);};
-window.ctxCopy=function(){if(_ctxMsg?.text) navigator.clipboard?.writeText(_ctxMsg.text).then(()=>toast('Скопировано','ok'));closeCtx();};
+window.ctxCopy=function(){if(_ctxMsg?.text) navigator.clipboard?.writeText(_ctxMsg.text).then(()=>toast(t('toast.copied'),'ok'));closeCtx();};
 window.ctxCopyMsgLink=function(){if(!_ctxMsg||!S.chId) return;const link=`${location.origin+location.pathname}#ch/${S.srvId}/${S.chId}`;navigator.clipboard?.writeText(link).then(()=>toast('Ссылка скопирована '+ti('link',13),'ok'));closeCtx();};
 window.ctxDelete=async function(){
   if(!_ctxMsg) return;closeCtx();
@@ -16114,7 +16114,7 @@ window.setChNotif=function(chId,v){setNotif(parseInt(chId),v);closeModal();};
 // ── INVITE MANAGER ───────────────────────────────────────────
 async function showInviteManager(){
   closeModal();if(!canManageCurrentServer()){toast('Нет прав для просмотра приглашений','err');return;}const r=await api({action:'get_invites',serverId:S.srvId});const invites=r.ok?r.invites:[];
-  const list=invites.length?invites.map(inv=>`<div style="background:var(--bg3);border-radius:6px;padding:10px 12px;margin-bottom:8px;font-size:13px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><code style="flex:1;background:var(--bg0);padding:3px 8px;border-radius:4px;font-size:11px;word-break:break-all">${esc(inv.link)}</code><button class="btn btn-ghost" style="padding:3px 8px;font-size:12px" onclick="navigator.clipboard?.writeText('${esc(inv.link)}').then(()=>toast('Скопировано','ok'))">${ti('clipboard',13)}</button><button class="btn btn-red" style="padding:3px 8px;font-size:12px" onclick="deleteInvite('${esc(inv.code)}')">✕</button></div><div style="color:var(--text3)">от ${esc(inv.creatorName)} · ${inv.uses}${inv.maxUses?'/'+inv.maxUses:''} исп.</div></div>`).join(''):'<p style="color:var(--text3);font-size:13px">Нет приглашений</p>';
+  const list=invites.length?invites.map(inv=>`<div style="background:var(--bg3);border-radius:6px;padding:10px 12px;margin-bottom:8px;font-size:13px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><code style="flex:1;background:var(--bg0);padding:3px 8px;border-radius:4px;font-size:11px;word-break:break-all">${esc(inv.link)}</code><button class="btn btn-ghost" style="padding:3px 8px;font-size:12px" onclick="navigator.clipboard?.writeText('${esc(inv.link)}').then(()=>toast(t('toast.copied'),'ok'))">${ti('clipboard',13)}</button><button class="btn btn-red" style="padding:3px 8px;font-size:12px" onclick="deleteInvite('${esc(inv.code)}')">✕</button></div><div style="color:var(--text3)">от ${esc(inv.creatorName)} · ${inv.uses}${inv.maxUses?'/'+inv.maxUses:''} исп.</div></div>`).join(''):'<p style="color:var(--text3);font-size:13px">Нет приглашений</p>';
   showModal(`<h2>${ti('link',18)} ${t('server.invitesTitle')}</h2><p style="font-size:12px;color:var(--text3);margin-bottom:8px">${t('server.inviteFormat',{url:(APP_CFG.siteUrl||location.origin)})}</p><button class="btn btn-gold btn-full" onclick="createInvite()" style="margin-bottom:16px">${ti('plus',14)} ${t('server.createInvite')}</button>${list}`);
 }
 window.createInvite=async function(){const r=await api({action:'create_invite',serverId:S.srvId,maxUses:0,expiresHours:0});if(!r.ok){toast(r.error,'err');return;}navigator.clipboard?.writeText(r.link).then(()=>toast('Ссылка скопирована '+ti('link',13),'ok'));await showInviteManager();};
@@ -17892,7 +17892,7 @@ const MAM = (function(){
       const w=_windows[chId]; if(!w) return;
       const el=w.el;
       if(!document.fullscreenElement){
-        el.requestFullscreen().catch(()=>toast('Полный экран недоступен','err',2000));
+        el.requestFullscreen().catch(()=>toast(t('toast.fullscreenNotSupported'),'err',2000));
       } else {
         document.exitFullscreen();
       }
@@ -17924,7 +17924,7 @@ window.MAM=MAM;
 // ── HTML FILE LOADER FOR MINI-APP ────────────────────────────
 function loadHtmlFileToTextarea(input, textareaId){
   const file=input.files[0];if(!file) return;
-  if(file.size>1048576){toast('Файл слишком большой (макс. 1 МБ)','err');return;}
+  if(file.size>1048576){toast(t('toast.fileTooLarge'),'err');return;}
   const reader=new FileReader();
   reader.onload=e=>{
     const ta=document.getElementById(textareaId);
@@ -18135,7 +18135,7 @@ window.insertApiTemplate=function(){
   ].join("\n");
   ta.value=html;
   autoGrow(ta);
-  toast('Template inserted','ok',2000);
+  toast(t('toast.templateInserted'),'ok',2000);
 };
 window.showCreateAppChannelModal=showCreateAppChannelModal;
 window.createAppChannel=async function(){

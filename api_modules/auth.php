@@ -21,7 +21,7 @@ if (!isset($db) || !isset($d)) { return; }
         if (mb_strlen($name, 'UTF-8') > USERNAME_MAX_LEN) apiFail('Имя: максимум ' . USERNAME_MAX_LEN . ' символов');
         if (mb_strlen($pass, 'UTF-8') < PASSWORD_MIN_LEN) apiFail('Пароль: минимум ' . PASSWORD_MIN_LEN . ' символов');
         if (PASSWORD_MAX_LEN > 0 && mb_strlen($pass, 'UTF-8') > PASSWORD_MAX_LEN) apiFail('Пароль: максимум ' . PASSWORD_MAX_LEN . ' символов');
-        if (!preg_match('/^[\w\-\.\x{0400}-\x{04FF}]+$/u', $name)) apiFail('Недопустимые символы в имени');
+        if (!preg_match('/^[\w\-\.\x{0400}-\x{04FF}\x{4E00}-\x{9FFF}\x{3400}-\x{4DBF}\x{F900}-\x{FAFF}]+$/u', $name)) apiFail('Недопустимые символы в имени');
         $ip    = getClientIP();
         $ipBan = $db->prepare("SELECT id FROM global_bans WHERE reg_ip=? AND reg_ip!='' LIMIT 1");
         $ipBan->execute([$ip]);

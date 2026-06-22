@@ -8,7 +8,7 @@
 
 Серверы, текстовые каналы, личные сообщения, голосовые комнаты, звонки, реакции и обмен файлами — в одном привычном интерфейсе. Без сборки, без Node, без отдельного сервера БД, за которым нужно следить. Только PHP и один файл SQLite.
 
-[Русский](README.md) · [English](docs/README.en.md) · [Deutsch](docs/README.de.md) · [Français](docs/README.fr.md)
+[Русский](README.md) · [English](docs/README.en.md) · [Deutsch](docs/README.de.md) · [Français](docs/README.fr.md) · [简体中文](docs/README.zh.md)
 
 </div>
 

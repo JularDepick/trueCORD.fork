@@ -6,7 +6,7 @@
 
 Serveurs, canaux textuels, messages privés, salons vocaux, appels, réactions et partage de fichiers — dans une interface familière. Pas d'étape de build, pas de Node, pas de serveur de base de données à surveiller. Juste PHP et un fichier SQLite.
 
-[Русский](../README.md) · [English](README.en.md) · [Deutsch](README.de.md) · [Français](README.fr.md)
+[Русский](../README.md) · [English](README.en.md) · [Deutsch](README.de.md) · [Français](README.fr.md) · [简体中文](README.zh.md)
 
 </div>
 

@@ -7,7 +7,7 @@
 
 Server, Textkanäle, Direktnachrichten, Sprachräume, Anrufe, Reaktionen und Dateiaustausch — in einer vertrauten Oberfläche. Kein Build-Schritt, kein Node, kein Datenbankserver, um den man sich kümmern muss. Nur PHP und eine SQLite-Datei.
 
-[Русский](../README.md) · [English](README.en.md) · [Deutsch](README.de.md) · [Français](README.fr.md)
+[Русский](../README.md) · [English](README.en.md) · [Deutsch](README.de.md) · [Français](README.fr.md) · [简体中文](README.zh.md)
 
 </div>
 

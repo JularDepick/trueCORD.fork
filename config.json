@@ -3,7 +3,7 @@
     "name": "trueCORD",
     "tagline": "A self-hosted, Discord-style chat platform you can run yourself.",
     "description": "trueCORD is a self-hosted chat platform with servers, text channels, direct messages, voice rooms, calls and file sharing in one familiar interface.",
-    "language": "en",
+    "language": "zh",
     "url": "",
     "api_endpoint": "truecord_api.php",
     "default_theme": "truecolor",

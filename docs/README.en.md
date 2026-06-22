@@ -6,7 +6,7 @@
 
 Servers, text channels, direct messages, voice rooms, calls, reactions and file sharing — in one familiar interface. No build step, no Node, no database server to babysit. Just PHP and a SQLite file.
 
-[Русский](../README.md) · [English](README.en.md) · [Deutsch](README.de.md) · [Français](README.fr.md)
+[Русский](../README.md) · [English](README.en.md) · [Deutsch](README.de.md) · [Français](README.fr.md) · [简体中文](README.zh.md)
 
 </div>
 

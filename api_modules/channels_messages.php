@@ -27,7 +27,7 @@ if (!isset($db) || !isset($d)) { return; }
         if (!in_array($chType, ['text','app'], true)) $chType = 'text';
         $name  = $chType === 'app'
             ? trim((string)($d['name'] ?? ''))
-            : (string)preg_replace('/[^a-z0-9_\-а-яё]/ui', '', strtolower(trim((string)($d['name'] ?? ''))));
+            : (string)preg_replace('/[^a-z0-9_\-а-яё\x{4E00}-\x{9FFF}\x{3400}-\x{4DBF}\x{F900}-\x{FAFF}]/ui', '', strtolower(trim((string)($d['name'] ?? ''))));
         $topic = trim((string)($d['topic'] ?? '')); $desc = trim((string)($d['description'] ?? ''));
         $pr    = (string)($d['permRead'] ?? 'all'); $pw = (string)($d['permWrite'] ?? 'all');
         $appIcon  = trim((string)($d['appIcon'] ?? ''));
@@ -60,7 +60,7 @@ if (!isset($db) || !isset($d)) { return; }
         if (!in_array($chType, ['text','app'], true)) $chType = 'text';
         $name  = $chType === 'app'
             ? trim((string)($d['name'] ?? ''))
-            : (string)preg_replace('/[^a-z0-9_\-а-яё]/ui', '', strtolower(trim((string)($d['name'] ?? ''))));
+            : (string)preg_replace('/[^a-z0-9_\-а-яё\x{4E00}-\x{9FFF}\x{3400}-\x{4DBF}\x{F900}-\x{FAFF}]/ui', '', strtolower(trim((string)($d['name'] ?? ''))));
         $topic = trim((string)($d['topic'] ?? '')); $desc = trim((string)($d['description'] ?? ''));
         $pr    = (string)($d['permRead'] ?? 'all'); $pw = (string)($d['permWrite'] ?? 'all');
         $appIcon  = trim((string)($d['appIcon'] ?? ($ch['app_icon'] ?? '')));
