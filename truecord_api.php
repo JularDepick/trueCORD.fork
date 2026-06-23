@@ -725,9 +725,11 @@ try {
 
     function siteBaseUrl(): string {
         if (defined('SITE_URL') && SITE_URL) return rtrim(SITE_URL, '/');
-        $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['SERVER_PORT'] ?? '') === '443');
+        $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (($_SERVER['SERVER_PORT'] ?? '') === '443')
+            || strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
         $scheme = $https ? 'https' : 'http';
-        $host = $_SERVER['HTTP_HOST'] ?? '';
+        $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? '';
         return $host ? $scheme . '://' . $host : '';
     }
 
@@ -1137,10 +1139,8 @@ try {
                 error_log('[trueCORD] thumb skipped: ' . $e->getMessage());
             }
         }
-        $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-        $host  = $_SERVER['HTTP_HOST'] ?? 'localhost';
-        $base  = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/');
-        return $https . '://' . $host . $base . '/uploads/' . $fname;
+        $base = siteBaseUrl();
+        return $base ? ($base . '/uploads/' . $fname) : ('/uploads/' . $fname);
     }
 
     function getReactionsForMsgs(PDO $db, array $msgIds, int $myUid): array {

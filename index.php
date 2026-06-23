@@ -8431,7 +8431,7 @@ textarea.fi { line-height:1.55 !important; }
       <div class="login-tab active" onclick="setTab('login')" data-i18n="common.enter">Вход</div>
       <div class="login-tab" onclick="setTab('reg')" data-i18n="common.register">Регистрация</div>
     </div>
-    <div id="fLogin">
+    <form id="fLogin" onsubmit="event.preventDefault();doLogin()">
       <div class="fg"><label class="fl" data-i18n="auth.username">Имя пользователя</label><input class="fi" id="lName" placeholder="Введите имя пользователя" data-i18n-ph="auth.enterUsername" autocomplete="username"></div>
  <div class="fg"><label class="fl" data-i18n="auth.password">Пароль</label><input class="fi" type="password" id="lPass" placeholder="••••••••" autocomplete="current-password"></div>
 <label class="remember-check">
@@ -8442,9 +8442,9 @@ textarea.fi { line-height:1.55 !important; }
   </span>
 </label>
 <div class="err-msg" id="lErr"></div>
-<button class="btn btn-gold btn-full" onclick="doLogin()" data-i18n="common.login">Войти</button>
-    </div>
-    <div id="fReg" style="display:none">
+<button class="btn btn-gold btn-full" type="submit" data-i18n="common.login">Войти</button>
+    </form>
+    <form id="fReg" style="display:none" onsubmit="event.preventDefault();doRegister()">
       <div class="fg"><label class="fl" data-i18n="auth.username">Имя пользователя</label><input class="fi" id="rName" placeholder="Минимум 4 символа" data-i18n-ph="auth.min4" autocomplete="username"><div class="fi-hint">4–<?= USERNAME_MAX_LEN ?> <span data-i18n="auth.usernameHint">символов: буквы, цифры,</span> _, -, <span data-i18n="auth.dot">точка</span></div></div>
       <div class="fg"><label class="fl" data-i18n="auth.password">Пароль</label><input class="fi" type="password" id="rPass" placeholder="Минимум 8 символов" data-i18n-ph="auth.min8" autocomplete="new-password" oninput="updatePasswordStrength(this.value)"></div>
       <div class="pw-strength" id="pwStrength">
@@ -8460,8 +8460,8 @@ textarea.fi { line-height:1.55 !important; }
         </label>
       </div>
       <div class="err-msg" id="rErr"></div>
-      <button class="btn btn-gold btn-full" onclick="doRegister()" data-i18n="auth.createAccount">Создать аккаунт</button>
-    </div>
+      <button class="btn btn-gold btn-full" type="submit" data-i18n="auth.createAccount">Создать аккаунт</button>
+    </form>
     <div class="login-lang-row login-lang-bottom">
       <label class="fl" for="loginLangSelect" data-i18n="lang.language">Язык</label>
       <select class="fi login-lang-select" id="loginLangSelect" data-lang-selector onchange="setLangLive(this.value)">
@@ -9819,8 +9819,10 @@ function isTextFile(url){return TEXT_EXTS.test(url||'');}
 function archiveIcon(ext){const e=(ext||'').toLowerCase();if(e==='zip'||e==='gz'||e==='bz2') return '🗜';return ti('archive',14);}
 
 // iOS Audio unlock
+let _audioUnlocked=false;
 ['touchstart','click','keydown'].forEach(ev=>{
   document.addEventListener(ev,function unlock(){
+    _audioUnlocked=true;
     if(!S.audioCtx){try{S.audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}
     if(S.audioCtx?.state==='suspended') S.audioCtx.resume().catch(()=>{});
     document.removeEventListener(ev,unlock);
@@ -9828,6 +9830,7 @@ function archiveIcon(ext){const e=(ext||'').toLowerCase();if(e==='zip'||e==='gz'
 });
 
 function getAC(){
+  if(!_audioUnlocked) return null;
   if(!S.audioCtx){try{S.audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}}
   if(S.audioCtx.state==='suspended') S.audioCtx.resume().catch(()=>{});
   return S.audioCtx;
